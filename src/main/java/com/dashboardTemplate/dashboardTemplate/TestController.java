@@ -10,4 +10,6 @@ public class TestController {
     public String hello() {
         return "Hello, DashboardTemplate";
     }
+
+    //Jenkins CI/CD 테스트용
 }
