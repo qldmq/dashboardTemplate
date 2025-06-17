@@ -5,7 +5,7 @@ pipeline {
         stage('Clone') {
             steps {
                 echo '📥 코드 가져오는 중...'
-                git credentialsId: 'your-jenkins-credential-id', url: 'https://github.com/qldmq/your-repo.git', branch: 'main'
+                git credentialsId: 'DashboardTemplate_Jenkins', url: 'https://github.com/qldmq/dashboardTemplate.git', branch: 'master'
             }
         }
 
