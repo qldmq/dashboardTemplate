@@ -12,6 +12,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo '🏗️ Gradle로 빌드 중...'
+                sh 'chmod +x ./gradlew'
                 sh './gradlew clean build'
             }
         }
