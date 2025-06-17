@@ -11,5 +11,5 @@ public class TestController {
         return "Hello, DashboardTemplate";
     }
 
-    //Jenkins CI/CD 테스트용
+    //Jenkins CI/CD 테스트용22
 }
