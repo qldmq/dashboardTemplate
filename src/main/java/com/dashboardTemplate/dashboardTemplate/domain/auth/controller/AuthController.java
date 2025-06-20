@@ -20,10 +20,13 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> signup(@RequestBody SignupRequest request) {
         log.info("sighup api 진입");
 
         return authService.signup(request.getCompanyId());
     }
+    
+    // 로그인
 }
