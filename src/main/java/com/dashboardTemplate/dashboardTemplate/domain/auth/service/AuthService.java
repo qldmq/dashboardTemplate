@@ -38,4 +38,6 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
     }
+    
+    // 로그인
 }
