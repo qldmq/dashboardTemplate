@@ -13,4 +13,5 @@ public interface AuthRepository extends JpaRepository<Auth, Integer> {
     Optional<Auth> findByCompanyId(String companyId);
 
     boolean existsByCompanyId(String companyId);
+    boolean existsByCompany(String company);
 }
