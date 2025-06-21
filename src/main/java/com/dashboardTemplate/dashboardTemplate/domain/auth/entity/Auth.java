@@ -20,7 +20,14 @@ public class Auth {
     @Column(name = "company_id")
     private String companyId;
 
+    @Column(name = "company")
+    private String company;
+
     public void setCompanyId(String companyId) {
         this.companyId = companyId;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 }

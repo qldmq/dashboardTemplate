@@ -32,7 +32,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefresthToken(String companyId) {
+    public String createRefreshToken(String companyId) {
         Claims claims = Jwts.claims().setSubject(companyId);
 
         return Jwts.builder()

@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class SignupRequest {
 
     private String companyId;
+    private String company;
 }
