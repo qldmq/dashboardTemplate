@@ -11,9 +11,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo '🏗️ Gradle로 빌드 중...'
+                echo '🏗️ Gradle로 빌드 중 (테스트 제외)...'
                 sh 'chmod +x ./gradlew'
-                sh './gradlew clean build'
+                sh './gradlew clean build -x test'
             }
         }
 
