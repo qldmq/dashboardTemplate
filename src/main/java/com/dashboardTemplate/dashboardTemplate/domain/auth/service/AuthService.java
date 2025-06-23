@@ -72,7 +72,7 @@ public class AuthService {
             String refreshToken = jwtTokenProvider.createRefreshToken(companyId);
 
             responseMap.put("company", company);
-            responseMap.put("acceessToken", accessToken);
+            responseMap.put("accessToken", accessToken);
             responseMap.put("refreshToken", refreshToken);
             responseMap.put("tableNamesList", tableNamesList);
             responseMap.put("message", "로그인 성공");
