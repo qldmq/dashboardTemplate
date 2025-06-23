@@ -30,7 +30,7 @@ public class DashboardController {
         String dashboardDescription = request.getDashboardDescription();
         int companyNum = userDetails.getAuth().getCompanyNum();
 
-        log.info(dashboardName, databaseName, dashboardDescription);
+        log.info("dashboardName: {}, databaseName: {}, dashboardDescription: {}", dashboardName, databaseName, dashboardDescription);
 
         return dashboardService.createDashboard(dashboardName, databaseName, dashboardDescription, companyNum);
     }
