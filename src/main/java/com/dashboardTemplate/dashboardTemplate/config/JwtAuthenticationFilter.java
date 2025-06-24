@@ -28,15 +28,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveToken(request);
+        System.out.println("Authorization token: " + token);
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String companyId = jwtTokenProvider.getCompanyIdFromToken(token);
+            System.out.println("companyId from token: " + companyId);
 
             UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(companyId);
+            System.out.println("UserDetails loaded: " + userDetails.getUsername());
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+            System.out.println("Token is invalid or missing");
         }
 
         filterChain.doFilter(request, response);
