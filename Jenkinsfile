@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DB_CREDENTIALS = credentials('DB_CREDENTIALS')
+    }
+
     stages {
         stage('Clone') {
             steps {
@@ -21,7 +25,11 @@ pipeline {
             steps {
                 echo '🚀 서버에 배포 중...'
                 sh 'pkill -f "java -jar" || true'
-                sh 'nohup java -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &'
+                sh '''
+                    nohup java -Dspring.datasource.username=$DB_CREDENTIALS_USR \
+                        -Dspring.datasource.password=$DB_CREDENTIALS_PSW \
+                        -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+                '''
             }
         }
     }
