@@ -21,7 +21,7 @@ pipeline {
             steps {
                 echo '🚀 서버에 배포 중...'
                 sh 'pkill -f "java -jar" || true'
-                sh 'nohup java -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > /home/ubuntu/app.log 2>&1 &'
+                sh 'nohup java -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &'
             }
         }
     }
