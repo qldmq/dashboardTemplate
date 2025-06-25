@@ -6,6 +6,8 @@ import com.dashboardTemplate.dashboardTemplate.domain.auth.repository.AuthReposi
 import com.dashboardTemplate.dashboardTemplate.domain.company.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -23,6 +26,10 @@ public class AuthService {
     private final AuthRepository authRepository;
     private final CompanyService companyService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    @Value("${jwt.refresh-token-validity}")
+    private long refreshTokenValidity;
 
     // 회원가입
     public ResponseEntity<Map<String, Object>> signup(String companyId, String company) {
@@ -70,6 +77,13 @@ public class AuthService {
             List<String> tableNamesList = companyService.getTableNamesByCompany(company);
             String accessToken = jwtTokenProvider.createAccessToken(companyId);
             String refreshToken = jwtTokenProvider.createRefreshToken(companyId);
+
+            redisTemplate.opsForValue().set(
+                    "RT:" + companyId,
+                    refreshToken,
+                    refreshTokenValidity,
+                    TimeUnit.MILLISECONDS
+            );
 
             responseMap.put("company", company);
             responseMap.put("accessToken", accessToken);
