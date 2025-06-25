@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DB_CREDENTIALS = credentials('DB_CREDENTIALS')
-    }
+            DB_CREDENTIALS = credentials('DB_CREDENTIALS')
+            DB_URL = "jdbc:mysql://127.0.0.1:3307/DashboardTemplate"
+        }
 
     stages {
         stage('Clone') {
@@ -25,11 +26,12 @@ pipeline {
             steps {
                 echo '🚀 서버에 배포 중...'
                 sh 'pkill -f "java -jar" || true'
-                sh '''
-                    nohup java -Dspring.datasource.username=$DB_CREDENTIALS_USR \
+                sh """
+                    nohup java -Dspring.datasource.url=$DB_URL \
+                        -Dspring.datasource.username=$DB_CREDENTIALS_USR \
                         -Dspring.datasource.password=$DB_CREDENTIALS_PSW \
                         -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-                '''
+                """
             }
         }
     }
