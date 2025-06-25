@@ -27,7 +27,8 @@ pipeline {
                 echo '🚀 서버에 배포 중...'
                 sh 'pkill -f "java -jar" || true'
                 sh """
-                    nohup java -Dspring.datasource.url=$DB_URL \
+                    nohup java -Dspring.profiles.active=dev \
+                        -Dspring.datasource.url=$DB_URL \
                         -Dspring.datasource.username=$DB_CREDENTIALS_USR \
                         -Dspring.datasource.password=$DB_CREDENTIALS_PSW \
                         -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
