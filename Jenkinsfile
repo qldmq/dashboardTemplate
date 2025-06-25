@@ -30,6 +30,7 @@ pipeline {
                     nohup java -Dspring.datasource.url=$DB_URL \
                         -Dspring.datasource.username=$DB_CREDENTIALS_USR \
                         -Dspring.datasource.password=$DB_CREDENTIALS_PSW \
+                        -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
                         -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
                 """
             }
