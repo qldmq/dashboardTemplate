@@ -81,20 +81,15 @@ pipeline {
                 // 4. 새로운 프로세스 시작
                 withCredentials([usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
                     sh '''
-                        echo "애플리케이션 시작 중..."
                         ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
                             cd /home/ubuntu/app
-                            echo '현재 디렉토리:' \\$(pwd)
-                            echo '파일 목록:'
-                            ls -la
-                            echo '애플리케이션 시작...'
-                            nohup java -Dspring.profiles.active=dev \\
-                                -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3307/DashboardTemplate \\
-                                -Dspring.datasource.username=${DB_USER} \\
-                                -Dspring.datasource.password=${DB_PASS} \\
-                                -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \\
-                                -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-                            echo '애플리케이션 시작 명령 실행 완료'
+                            nohup java -Dspring.profiles.active=dev \
+                              -Dspring.datasource.url=jdbc:mysql://dashboardtemplate.ctyqackomgq0.ap-northeast-2.rds.amazonaws.com:3306/DashboardTemplate \
+                              -Dspring.datasource.username=\\${DB_USER} \
+                              -Dspring.datasource.password=\\${DB_PASS} \
+                              -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
+                              -Djwt.secret=Dr0G3kMd5jjKdpmw9K5X+6DBd0FrFMdFhEFNyRZCf+M= \
+                              -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
                         "
                     '''
                 }
