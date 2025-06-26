@@ -9,7 +9,7 @@ pipeline {
         stage('Clone') {
             steps {
                 echo '📥 코드 가져오는 중...'
-                git credentialsId: 'DashboardTemplate_Jenkins', url: 'https://github.com/qldmq/dashboardTemplate.git', branch: 'master'
+                git credentialsId: 'DashboardTemplate_PAT', url: 'https://github.com/qldmq/dashboardTemplate.git', branch: 'master'
             }
         }
 
@@ -52,46 +52,45 @@ echo '📦 기존 프로세스 정리 시작...'
 
 # PID 종료
 if [ -f app.pid ]; then
-    PID=$(cat app.pid)
-    if ps -p $PID > /dev/null 2>&1; then
-        echo \"🔻 종료 중: $PID\"
-        kill -15 $PID
+    PID=\\$(cat app.pid)
+    if ps -p \\$PID > /dev/null 2>&1; then
+        echo \"🔻 종료 중: \\$PID\"
+        kill -15 \\$PID
         sleep 5
-        if ps -p $PID > /dev/null 2>&1; then
-            echo \"⛔️ 강제 종료: $PID\"
-            kill -9 $PID
+        if ps -p \\$PID > /dev/null 2>&1; then
+            echo \"⛔️ 강제 종료: \\$PID\"
+            kill -9 \\$PID
         fi
     fi
     rm -f app.pid
 fi
 
 # 포트 8080 정리
-PORT_PID=$(lsof -ti:8080)
-if [ -n \"$PORT_PID\" ]; then
-    echo \"🛑 포트 점유 프로세스 종료: $PORT_PID\"
-    kill -15 $PORT_PID
+PORT_PID=\\$(/usr/bin/lsof -ti:8080)
+if [ -n \"\\$PORT_PID\" ]; then
+    echo \"🛑 포트 점유 프로세스 종료: \\$PORT_PID\"
+    kill -15 \\$PORT_PID
     sleep 5
-    if lsof -ti:8080 > /dev/null 2>&1; then
-        kill -9 $(lsof -ti:8080)
+    if /usr/bin/lsof -ti:8080 > /dev/null 2>&1; then
+        kill -9 \\$(/usr/bin/lsof -ti:8080)
     fi
 fi
 
 # 로그 백업
 if [ -f app.log ]; then
-    mv app.log app.log.bak.$(date +%Y%m%d_%H%M%S)
+    mv app.log app.log.bak.\\$(date +%Y%m%d_%H%M%S)
 fi
 
 echo '🚀 애플리케이션 실행...'
-nohup java \\
+sh -c 'nohup java \\
   -Dspring.profiles.active=dev \\
   -Dspring.datasource.url=jdbc:mysql://dashboardtemplate.ctyqackomgq0.ap-northeast-2.rds.amazonaws.com:3306/DashboardTemplate \\
   -Dspring.datasource.username=${DB_USER} \\
   -Dspring.datasource.password=${DB_PASS} \\
   -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \\
   -Djwt.secret=${JWT_SECRET} \\
-  -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+  -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 & echo \\$! > app.pid'
 
-echo $! > app.pid
 EOF
 
                             chmod +x start_app.sh
@@ -128,7 +127,7 @@ EOF
                 ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
                     ps aux | grep -v grep | grep java || echo '실행 중인 Java 프로세스 없음'
                     netstat -tlnp | grep 8080 || echo '포트 8080 사용 없음'
-                    lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
+                    /usr/bin/lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
                     tail -30 /home/ubuntu/app/app.log || echo '로그 파일 없음'
                 "
             '''
