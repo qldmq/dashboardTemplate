@@ -19,7 +19,7 @@ public class JwtTokenProvider {
     private long accessTokenValidity;
 
     @Value("${jwt.refresh-token-validity}")
-    private long refresthTokenValidity;
+    private long refreshTokenValidity;
 
     public String createAccessToken(String companyId) {
         Claims claims = Jwts.claims().setSubject(companyId);
@@ -38,7 +38,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + refresthTokenValidity))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
