@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-            DB_CREDENTIALS = credentials('DB_CREDENTIALS')
-        }
+        DB_CREDENTIALS = credentials('DB_CREDENTIALS')
+    }
 
     stages {
         stage('Clone') {
@@ -29,18 +29,17 @@ pipeline {
                 sh "scp -i /var/jenkins_home/.ssh/dashboardTemplate.pem build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/"
 
                 // 서버에 접속해서 기존 프로세스 종료 후 새로 실행
-                    sh '''
-                        ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 << EOF
-                            pkill -f "java -jar" || true
-                            nohup java -Dspring.profiles.active=dev \
-                                -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3307/DashboardTemplate \
-                                -Dspring.datasource.username=$DB_CREDENTIALS_USR \
-                                -Dspring.datasource.password=$DB_CREDENTIALS_PSW \
-                                -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
-                                -jar /home/ubuntu/app/dashboardTemplate-0.0.1-SNAPSHOT.jar > /home/ubuntu/app/app.log 2>&1 &
-                        EOF
-                    '''
-
+                sh """
+                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 bash -c '
+                        pkill -f "java -jar" || true
+                        nohup java -Dspring.profiles.active=dev \
+                            -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3307/DashboardTemplate \
+                            -Dspring.datasource.username=${DB_CREDENTIALS_USR} \
+                            -Dspring.datasource.password=${DB_CREDENTIALS_PSW} \
+                            -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
+                            -jar /home/ubuntu/app/dashboardTemplate-0.0.1-SNAPSHOT.jar > /home/ubuntu/app/app.log 2>&1 &
+                    '
+                """
             }
         }
     }
