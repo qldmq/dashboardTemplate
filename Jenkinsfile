@@ -71,10 +71,9 @@ pipeline {
                     ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "java -version"
                 '''
 
-                // 여기서 JWT_SECRET 크레덴셜도 함께 사용
                 withCredentials([
                     usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
-                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET')
+                    string(credentialsId: 'DashboardTemplate_JWT_Secret', variable: 'JWT_SECRET')
                 ]) {
                     sh """
                         ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 '
