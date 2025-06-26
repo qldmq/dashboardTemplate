@@ -3,7 +3,6 @@ pipeline {
 
     environment {
             DB_CREDENTIALS = credentials('DB_CREDENTIALS')
-            DB_URL = "jdbc:mysql://127.0.0.1:3307/DashboardTemplate"
         }
 
     stages {
@@ -25,15 +24,22 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '🚀 서버에 배포 중...'
-                sh 'pkill -f "java -jar" || true'
+
+                // 빌드 파일 서버로 복사
+                sh "scp -i /c/project/pem/dashboardTemplate.pem build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/"
+
+                // 서버에 접속해서 기존 프로세스 종료 후 새로 실행
                 sh """
-                    nohup java -Dspring.profiles.active=dev \
-                        -Dspring.datasource.url=$DB_URL \
-                        -Dspring.datasource.username=$DB_CREDENTIALS_USR \
-                        -Dspring.datasource.password=$DB_CREDENTIALS_PSW \
-                        -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
-                        -jar build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-                """
+                    ssh -i /root/.ssh/pem/dashboardTemplate.pem ubuntu@52.79.122.132 << EOF
+                        pkill -f "java -jar" || true
+                        nohup java -Dspring.profiles.active=dev \\
+                            -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3307/DashboardTemplate \\
+                            -Dspring.datasource.username=${DB_CREDENTIALS_USR} \\
+                            -Dspring.datasource.password=${DB_CREDENTIALS_PSW} \\
+                            -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \\
+                            -jar /home/ubuntu/app/dashboardTemplate-0.0.1-SNAPSHOT.jar > /home/ubuntu/app/app.log 2>&1 &
+                    EOF
+                    """
             }
         }
     }
