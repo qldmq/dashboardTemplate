@@ -38,6 +38,14 @@ pipeline {
                 '''
 
                 sh '''
+                    echo "배포 전 포트 상태 확인..."
+                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
+                        netstat -tlnp | grep 8080 || echo '8080 포트 사용 없음'
+                        lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
+                    "
+                '''
+
+                sh '''
                     echo "앱 디렉토리 확인..."
                     ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "ls -la /home/ubuntu/app/ || mkdir -p /home/ubuntu/app"
                 '''
@@ -51,29 +59,73 @@ pipeline {
                 sh "scp -i /var/jenkins_home/.ssh/dashboardTemplate.pem build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/"
 
                 sh '''
-                    echo "기존 프로세스 종료 중..."
+                    echo "기존 프로세스 및 포트 종료 중..."
                     ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
-                        # 정확한 jar 파일명으로 프로세스 찾기
+                        # 1. jar 파일로 실행된 프로세스 종료
                         PID=\\$(ps aux | grep -v grep | grep 'dashboardTemplate-0.0.1-SNAPSHOT.jar' | awk '{print \\$2}') || true
 
-                        if [ ! -z \"\\$PID\" ] && [ \"\\$PID\" != \"\" ]; then
+                        if [ -n \"\\$PID\" ]; then
                             echo \"프로세스 \\$PID 종료 중...\"
                             kill -15 \\$PID || true
-                            sleep 5
 
-                            # 프로세스가 여전히 살아있는지 확인
+                            # 최대 30초 동안 graceful shutdown 대기
+                            for i in {1..30}; do
+                                if ! ps -p \\$PID > /dev/null 2>&1; then
+                                    echo \"프로세스 정상 종료됨 (\\${i}초 후)\"
+                                    break
+                                fi
+                                echo \"프로세스 종료 대기 중... (\\${i}/30초)\"
+                                sleep 1
+                            done
+
+                            # 여전히 살아있다면 강제 종료
                             if ps -p \\$PID > /dev/null 2>&1; then
                                 echo \"강제 종료 실행...\"
                                 kill -9 \\$PID || true
+                                sleep 2
                             fi
-                            echo \"프로세스 종료 완료\"
                         else
-                            echo \"종료할 프로세스 없음\"
+                            echo \"dashboardTemplate jar 프로세스 없음\"
+                        fi
+
+                        # 2. 8080 포트를 사용하는 모든 프로세스 종료
+                        echo \"8080 포트 사용 프로세스 확인 및 종료...\"
+                        PORT_PID=\\$(lsof -ti:8080) || true
+
+                        if [ -n \"\\$PORT_PID\" ]; then
+                            echo \"8080 포트 사용 프로세스: \\$PORT_PID\"
+                            kill -15 \\$PORT_PID || true
+                            sleep 5
+
+                            # 포트가 여전히 사용 중이면 강제 종료
+                            if lsof -ti:8080 > /dev/null 2>&1; then
+                                echo \"8080 포트 강제 해제...\"
+                                kill -9 \\$(lsof -ti:8080) || true
+                                sleep 2
+                            fi
+                        else
+                            echo \"8080 포트 사용 프로세스 없음\"
+                        fi
+
+                        # 3. PID 파일이 있다면 삭제
+                        if [ -f /home/ubuntu/app/app.pid ]; then
+                            echo \"기존 PID 파일 삭제...\"
+                            rm -f /home/ubuntu/app/app.pid
+                        fi
+
+                        # 4. 최종 확인
+                        echo \"포트 8080 상태 최종 확인...\"
+                        if lsof -ti:8080 > /dev/null 2>&1; then
+                            echo \"⚠️ 경고: 8080 포트가 여전히 사용 중입니다\"
+                            lsof -i:8080 || true
+                            exit 1
+                        else
+                            echo \"✅ 8080 포트 해제 완료\"
                         fi
                     "
                 '''
 
-                sleep(time: 3, unit: 'SECONDS')
+                sleep(time: 10, unit: 'SECONDS')
 
                 sh '''
                     echo "Java 버전 확인..."
@@ -87,6 +139,11 @@ pipeline {
                     sh '''
                         ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
                             cd /home/ubuntu/app
+
+                            # 기존 로그 파일 백업 (선택사항)
+                            if [ -f app.log ]; then
+                                mv app.log app.log.bak.\\$(date +%Y%m%d_%H%M%S) || true
+                            fi
 
                             # 애플리케이션 시작 스크립트 생성
                             cat > start_app.sh << 'EOF'
@@ -137,6 +194,8 @@ EOF
                                     fi
                                 else
                                     echo '❌ PID \\$PID 프로세스가 종료됨'
+                                    echo '📋 최근 로그:'
+                                    tail -10 /home/ubuntu/app/app.log || echo '로그 파일을 찾을 수 없습니다'
                                 fi
                             else
                                 echo '⏳ PID 파일 생성 대기 중...'
@@ -189,6 +248,7 @@ EOF
                     ps aux | grep -v grep | grep java || echo '실행 중인 Java 프로세스 없음'
                     echo '포트 상태:'
                     netstat -tlnp | grep 8080 || echo '포트 8080이 사용되지 않음'
+                    lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
                     echo '최근 로그:'
                     tail -30 /home/ubuntu/app/app.log || echo '로그 파일을 찾을 수 없습니다'
                 "
