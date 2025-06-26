@@ -52,10 +52,21 @@ pipeline {
                 // 빌드 파일 서버로 복사
                 sh "scp -i /var/jenkins_home/.ssh/dashboardTemplate.pem build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/"
 
-                // 1. 기존 프로세스 종료
+                // 1. 기존 프로세스 종료 (수정된 부분)
                 sh '''
                     echo "기존 프로세스 종료 중..."
-                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "pkill -f dashboardTemplate || echo '종료할 프로세스 없음'"
+                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
+                        PID=\\$(pgrep -f dashboardTemplate) || true
+                        if [ ! -z \"\\$PID\" ]; then
+                            echo \"프로세스 \\$PID 종료 중...\"
+                            kill -15 \\$PID
+                            sleep 3
+                            kill -9 \\$PID 2>/dev/null || true
+                            echo \"프로세스 종료 완료\"
+                        else
+                            echo \"종료할 프로세스 없음\"
+                        fi
+                    "
                 '''
 
                 // 2. 잠시 대기
@@ -73,7 +84,7 @@ pipeline {
                         echo "애플리케이션 시작 중..."
                         ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
                             cd /home/ubuntu/app
-                            echo '현재 디렉토리:' \$(pwd)
+                            echo '현재 디렉토리:' \\$(pwd)
                             echo '파일 목록:'
                             ls -la
                             echo '애플리케이션 시작...'
