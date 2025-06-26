@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @Operation(summary = "jenkins 자동배포 테스트1", description = "자동배포 테스트1")
+    @Operation(summary = "jenkins 자동배포 테스트01", description = "자동배포 테스트01")
     @GetMapping("/hello1")
     public String hello() {
         return "Hello, DashboardTemplate";
