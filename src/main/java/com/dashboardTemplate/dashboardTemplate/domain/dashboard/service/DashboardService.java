@@ -4,6 +4,8 @@ import com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity.Dashboard
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity.DashboardStatus;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.repository.DashboardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,6 +25,7 @@ public class DashboardService {
     private final SecureRandom secureRandom = new SecureRandom();
     private final PasswordEncoder passwordEncoder;
 
+    // 대시보드 생성
     public ResponseEntity<Map<String, Object>> createDashboard(String dashboardName, String databaseName, String dashboardDescription, int companyNum) {
 
         Map<String, Object> responseMap = new HashMap<>();
@@ -45,4 +49,24 @@ public class DashboardService {
         responseMap.put("message", "저장이 완료되었습니다.");
         return ResponseEntity.status(HttpStatus.OK).body(responseMap);
     }
+
+    // 대시보드 조회
+    public ResponseEntity<Map<String, Object>> checkDashboardList(int companyNum, Pageable pageable) {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            Page<Dashboard> dashboardPage = dashboardRepository.findByCompanyNum(companyNum, pageable);
+
+            responseMap.put("dashboardList", dashboardPage.getContent());
+            responseMap.put("totalPages", dashboardPage.getTotalPages()); // 전체 페이지 수
+            responseMap.put("totalCount", dashboardPage.getTotalElements()); // 전체 데이터 수
+            responseMap.put("currentPage", dashboardPage.getNumber()); // 현재 페이지 번호
+
+            return ResponseEntity.ok(responseMap);
+        } catch (Exception e) {
+            responseMap.put("message", "서버 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
+
 }
