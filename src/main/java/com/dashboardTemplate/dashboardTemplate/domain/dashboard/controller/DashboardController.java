@@ -37,8 +37,8 @@ public class DashboardController {
         return dashboardService.createDashboard(dashboardName, databaseName, dashboardDescription, companyNum);
     }
 
-    @Operation(summary = "대시보드 조회 (페이지네이션)")
-    @GetMapping("/dashboard")
+    @Operation(summary = "대시보드 조회 (페이지네이션)", description = "companyId로 본인이 만든 대시보드를 페이지네이션을 통해 리스트로 조회")
+    @GetMapping("/dashboards")
     public ResponseEntity<Map<String, Object>> checkDashboardList (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                    @RequestParam(defaultValue = "0") int page,
                                                                    @RequestParam(defaultValue = "10") int size) {
