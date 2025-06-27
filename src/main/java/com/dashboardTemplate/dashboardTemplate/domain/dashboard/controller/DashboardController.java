@@ -6,6 +6,8 @@ import com.dashboardTemplate.dashboardTemplate.domain.dashboard.service.Dashboar
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,5 +35,19 @@ public class DashboardController {
         log.info("dashboardName: {}, databaseName: {}, dashboardDescription: {}", dashboardName, databaseName, dashboardDescription);
 
         return dashboardService.createDashboard(dashboardName, databaseName, dashboardDescription, companyNum);
+    }
+
+    @Operation(summary = "대시보드 조회 (페이지네이션)")
+    @GetMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> checkDashboardList (@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "10") int size) {
+
+        log.info("checkDashboard api 진입");
+
+        int companyNum = userDetails.getAuth().getCompanyNum();
+        Pageable pageable = PageRequest.of(page, size);
+
+        return dashboardService.checkDashboardList(companyNum, pageable);
     }
 }
