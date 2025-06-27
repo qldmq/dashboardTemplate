@@ -1,5 +1,6 @@
 package com.dashboardTemplate.dashboardTemplate.domain.auth.controller;
 
+import com.dashboardTemplate.dashboardTemplate.config.UserDetailsImpl;
 import com.dashboardTemplate.dashboardTemplate.domain.auth.dto.LoginRequest;
 import com.dashboardTemplate.dashboardTemplate.domain.auth.dto.SignupRequest;
 import com.dashboardTemplate.dashboardTemplate.domain.auth.service.AuthService;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -46,5 +48,16 @@ public class AuthController {
         log.info("login api 진입");
 
         return authService.login(request.getCompanyId());
+    }
+    
+    // 로그아웃
+    @Operation(summary = "로그아웃", description = "Redis에서 RefreshToken을 삭제하고 accessToken은 blackList에 등록해서 즉시 로그아웃 처리")
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(@RequestHeader("Authorization") String accessToken, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("logout api 진입");
+
+        String companyId = userDetails.getAuth().getCompanyId();
+
+        return authService.logout(accessToken, companyId);
     }
 }
