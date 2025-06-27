@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/","/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/dashboard").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -61,7 +61,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("https://rag-dashboard-console-7kzye1ukc-yonghos-projects-9e5d11e4.vercel.app/"));
+        config.setAllowedOrigins(List.of("https://rag-dashboard-console.vercel.app",
+                "http://localhost:5173",
+                "https://dashboardtemplate.duckdns.org"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
