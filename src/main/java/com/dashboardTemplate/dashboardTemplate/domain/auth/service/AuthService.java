@@ -136,4 +136,42 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
     }
+    
+    // 로그아웃
+    public ResponseEntity<Map<String, Object>> logout(String accessToken, String companyId) {
+
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            String redisKey = "RT:" + companyId;
+            if (redisTemplate.hasKey(redisKey)) {
+                redisTemplate.delete(redisKey);
+            }
+
+            if (accessToken != null && accessToken.startsWith("Bearer ")) {
+                accessToken = accessToken.substring(7);
+            }
+
+            if (jwtTokenProvider.validateToken(accessToken)) {
+                Date expiration = jwtTokenProvider.getExpirationDateFromToken(accessToken);
+                long now = System.currentTimeMillis();
+                long remainingTime = expiration.getTime() - now;
+
+                if (remainingTime > 0) {
+                    redisTemplate.opsForValue().set(
+                            "BL:" + accessToken,
+                            "logout",
+                            remainingTime,
+                            TimeUnit.MILLISECONDS
+                    );
+                }
+            }
+
+            responseMap.put("message", "로그아웃되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            responseMap.put("message", "서버 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
 }
