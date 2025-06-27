@@ -19,6 +19,17 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+
+    // AccessToken 재발급
+    @Operation(summary = "AccessToken 재발급", description = "refreshToken을 통해 accessToken 재발급")
+    @PostMapping("/reissue")
+    public ResponseEntity<Map<String, Object>> reissue(@RequestBody Map<String, String> request) {
+        log.info("reissue api 진입");
+
+        String refreshToken = request.get("refreshToken");
+        return authService.reissue(refreshToken);
+    }
+
     // 회원가입
     @Operation(summary = "회원가입", description = "companyId를 받아 회원가입 처리")
     @PostMapping("/signup")

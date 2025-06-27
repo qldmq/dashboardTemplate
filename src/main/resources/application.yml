@@ -9,10 +9,6 @@ spring:
   profiles:
     active: dev
 
-  redis:
-    host: localhost
-    port: 6379
-
 jwt:
   secret: ${jwt.secret}
   access-token-validity: 600000

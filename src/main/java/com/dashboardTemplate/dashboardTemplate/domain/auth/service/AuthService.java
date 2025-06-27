@@ -12,10 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -30,6 +27,44 @@ public class AuthService {
 
     @Value("${jwt.refresh-token-validity}")
     private long refreshTokenValidity;
+
+    // 토큰 재발급
+    public ResponseEntity<Map<String, Object>> reissue(String refreshToken) {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        try {
+            if (!jwtTokenProvider.validateToken(refreshToken)) {
+                responseMap.put("message", "RefreshToken이 유효하지 않습니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+            }
+
+            String companyId = jwtTokenProvider.getCompanyIdFromToken(refreshToken);
+            String redisRefreshToken = redisTemplate.opsForValue().get("RT:" + companyId);
+
+            if (redisRefreshToken == null) {
+                responseMap.put("message", "로그인 정보가 없습니다. 다시 로그인해주세요.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+            }
+
+            if (!redisRefreshToken.equals(refreshToken)) {
+                responseMap.put("message", "RefreshToken이 일치하지 않습니다.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+            }
+
+            String newAccessToken = jwtTokenProvider.createAccessToken(companyId);
+            Date expiration = jwtTokenProvider.getExpirationDateFromToken(newAccessToken);
+            long expirationTime = expiration.getTime();
+
+            responseMap.put("accessToken", newAccessToken);
+            responseMap.put("accessTokenExpiresAt", expirationTime);
+            responseMap.put("message", "토큰이 재발급되었습니다.");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            responseMap.put("message", "서버 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
 
     // 회원가입
     public ResponseEntity<Map<String, Object>> signup(String companyId, String company) {
@@ -85,10 +120,14 @@ public class AuthService {
                     TimeUnit.MILLISECONDS
             );
 
+            Date expiration = jwtTokenProvider.getExpirationDateFromToken(accessToken);
+            long expirationTime = expiration.getTime();
+
             responseMap.put("company", company);
             responseMap.put("accessToken", accessToken);
             responseMap.put("refreshToken", refreshToken);
             responseMap.put("tableNamesList", tableNamesList);
+            responseMap.put("accessTokenExpiresAt", expirationTime);
             responseMap.put("message", "로그인 성공");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
