@@ -57,11 +57,15 @@ public class DashboardService {
         try {
             Page<Dashboard> dashboardPage = dashboardRepository.findByCompanyNum(companyNum, pageable);
 
-            responseMap.put("dashboardList", dashboardPage.getContent());
             responseMap.put("totalPages", dashboardPage.getTotalPages()); // 전체 페이지 수
             responseMap.put("totalCount", dashboardPage.getTotalElements()); // 전체 데이터 수
-            responseMap.put("currentPage", dashboardPage.getNumber()); // 현재 페이지 번호
+            responseMap.put("currentPage", dashboardPage.getNumber() + 1); // 현재 페이지 번호
 
+            if (dashboardPage.isEmpty()) {
+                responseMap.put("dashboardList", "-");
+            } else {
+                responseMap.put("dashboardList", dashboardPage.getContent());
+            }
             return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
             responseMap.put("message", "서버 오류: " + e.getMessage());
