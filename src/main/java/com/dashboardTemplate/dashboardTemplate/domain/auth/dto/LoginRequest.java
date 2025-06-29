@@ -1,5 +1,6 @@
 package com.dashboardTemplate.dashboardTemplate.domain.auth.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class LoginRequest {
 
-    private String companyId;        // 로그인한 사용자 ID
+    @Schema(description = "companyId", example = "samsung_id")
+    private String companyId;
 }
