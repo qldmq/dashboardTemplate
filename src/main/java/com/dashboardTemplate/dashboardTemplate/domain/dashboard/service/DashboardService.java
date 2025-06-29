@@ -32,13 +32,14 @@ public class DashboardService {
 
         int randNum = secureRandom.nextInt(900000) + 100000;
         String id = passwordEncoder.encode(String.valueOf(randNum));
+        String text = (dashboardDescription.isEmpty() || dashboardDescription == null) ? "-" : dashboardDescription;
 
         Dashboard dashboard = Dashboard.builder()
                 .dashboardId(id)
                 .companyNum(companyNum)
                 .dashboardName(dashboardName)
                 .databaseName(databaseName)
-                .dashboardDescription(dashboardDescription)
+                .dashboardDescription(text)
                 .dashboardStatus(DashboardStatus.CREATED)
                 .createdAt(LocalDate.now())
                 .updatedAt(null)
@@ -60,12 +61,8 @@ public class DashboardService {
             responseMap.put("totalPages", dashboardPage.getTotalPages()); // 전체 페이지 수
             responseMap.put("totalCount", dashboardPage.getTotalElements()); // 전체 데이터 수
             responseMap.put("currentPage", dashboardPage.getNumber() + 1); // 현재 페이지 번호
+            responseMap.put("dashboardList", dashboardPage.getContent());
 
-            if (dashboardPage.isEmpty()) {
-                responseMap.put("dashboardList", "-");
-            } else {
-                responseMap.put("dashboardList", dashboardPage.getContent());
-            }
             return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
             responseMap.put("message", "서버 오류: " + e.getMessage());
