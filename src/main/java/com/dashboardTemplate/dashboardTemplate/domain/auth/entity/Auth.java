@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "member")
+@Table(name = "company")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Auth {
@@ -23,11 +23,18 @@ public class Auth {
     @Column(name = "company")
     private String company;
 
+    @Column(name = "company_eng")
+    private String companyEng;
+
     public void setCompanyId(String companyId) {
         this.companyId = companyId;
     }
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public void setCompanyEng(String companyEng) {
+        this.companyEng = companyEng;
     }
 }

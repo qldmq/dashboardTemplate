@@ -13,9 +13,13 @@ import java.util.List;
 public class CompanyService {
 
     private final JdbcTemplate jdbcTemplate;
-    private final String databaseName = "DashboardTemplate";
 
     public List<String> getTableNamesByCompany(String company) {
+
+        String currentDatabaseName = jdbcTemplate.queryForObject("SELECT DATABASE()", String.class);
+
+        log.info("현재 연결된 DB 이름: {}", currentDatabaseName);
+
         String sql = """
                 SELECT table_name
                 FROM information_schema.tables
@@ -23,7 +27,7 @@ public class CompanyService {
                   AND table_name LIKE CONCAT(?, '_%')
             """;
 
-        List<String> result = jdbcTemplate.queryForList(sql, String.class, databaseName, company);
+        List<String> result = jdbcTemplate.queryForList(sql, String.class, currentDatabaseName, company);
 
         return result;
     }
