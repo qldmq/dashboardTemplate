@@ -15,6 +15,11 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
   - JSON 데이터 출력 → ApexCharts 등 시각화 연동  
 - **진행 기간**: 2025.06 ~ 진행 중  
 - **개발 인원**: 2명
+- **URL**: https://rag-dashboard-console.vercel.app/login
+- **Swagger 주소**: https://dashboardtemplate.duckdns.org/swagger-ui/index.html
+- **Repository**
+  - **BackEnd:** https://github.com/qldmq/dashboardTemplate
+  - **FrontEnd:** https://github.com/ParkYongHo1/Rag-Dashboard-Console
 
 ### 🔧 **팀원**
 
@@ -58,3 +63,9 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 - ✅ 실무 기반 데이터 분석 UX 시뮬레이션
 - ✅ SQL + JS 데이터 흐름 완전 이해
 - ✅ 시각화 및 조건 설계 역량 증명
+
+---
+
+ **ERD**
+![image](https://github.com/user-attachments/assets/207d2907-13ae-4c38-b652-c3a0715f89ae)
+
