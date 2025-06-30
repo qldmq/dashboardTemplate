@@ -3,7 +3,7 @@ package com.dashboardTemplate.dashboardTemplate.domain.auth.service;
 import com.dashboardTemplate.dashboardTemplate.config.JwtTokenProvider;
 import com.dashboardTemplate.dashboardTemplate.domain.auth.entity.Auth;
 import com.dashboardTemplate.dashboardTemplate.domain.auth.repository.AuthRepository;
-import com.dashboardTemplate.dashboardTemplate.domain.company.service.CompanyService;
+import com.dashboardTemplate.dashboardTemplate.domain.JDBC.service.JDBCService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class AuthService {
 
     private final AuthRepository authRepository;
-    private final CompanyService companyService;
+    private final JDBCService JDBCService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -110,7 +110,7 @@ public class AuthService {
             String companyEng = companyOptional.get().getCompanyEng();
             String company = companyOptional.get().getCompany();
 
-            List<String> tableNamesList = companyService.getTableNamesByCompany(companyEng);
+            List<String> tableNamesList = JDBCService.getTableNamesByCompany(companyEng);
             String accessToken = jwtTokenProvider.createAccessToken(companyId);
             String refreshToken = jwtTokenProvider.createRefreshToken(companyId);
 
