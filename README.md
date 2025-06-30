@@ -33,7 +33,7 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 - ✅ **Swagger API 문서 자동화**
 - ✅ **로그인/회원가입** 기능 구현
 - ✅ **MySQL 기반** 데이터 저장
-- ✅ **HTTPS (JKS/PKCS12)** 설정 지원
+- ✅ **Nginx + Let's Encryp**를 통한 **HTTPS** 적용
 - ✅ **Jenkins**를 이용한 **CI/CD 파이프라인** 구축 (**Docker** 환경에서 실행)
 
 ---
