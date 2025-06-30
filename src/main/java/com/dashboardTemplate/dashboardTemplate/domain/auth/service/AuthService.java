@@ -107,9 +107,10 @@ public class AuthService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
             }
 
-            String company = companyOptional.get().getCompanyEng();
+            String companyEng = companyOptional.get().getCompanyEng();
+            String company = companyOptional.get().getCompany();
 
-            List<String> tableNamesList = companyService.getTableNamesByCompany(company);
+            List<String> tableNamesList = companyService.getTableNamesByCompany(companyEng);
             String accessToken = jwtTokenProvider.createAccessToken(companyId);
             String refreshToken = jwtTokenProvider.createRefreshToken(companyId);
 
