@@ -1,4 +1,4 @@
-# 🧩 **DashboardTemplate**
+# 🧩 **B2B 통계 대시보드 생성기**
 
 **기업 통계 분석을 위한 Spring Boot 백엔드 템플릿**  
 JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함한 템플릿입니다.
@@ -7,10 +7,12 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 
 ## 👥 **프로젝트 정보**
 
-- **프로젝트명**: DashboardTemplate  
+- **프로젝트명**: B2B 통계 대시보드 생성기
 - **설명**:  
-  기업의 주문, 매출 등의 데이터를 수집하고, 사용자가 원하는 조건(예: 날짜, 지역, 상품 등)으로 그룹핑하여 합계, 평균, 최댓값, 최솟값 등의 통계 정보를 산출해주는 백엔드 대시보드 템플릿입니다.  
-  Spring Boot 기반 구조로 다양한 기업용 대시보드 시스템에 활용할 수 있습니다.
+  - 기업별 로그인 및 프로젝트 테이블 선택  
+  - 사용자 정의 그룹 항목 및 집계 항목 커스터마이징  
+  - 조건 기반 통계 쿼리 자동 생성  
+  - JSON 데이터 출력 → ApexCharts 등 시각화 연동  
 - **진행 기간**: 2025.06 ~ 진행 중  
 - **개발 인원**: 2명
 
@@ -20,7 +22,6 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 |-----|--------------------|----------------|---------------------------------------------|
 |<img src="https://github.com/qldmq.png" width="80"/>| **김서현** | 백엔드 개발     | [서현 GitHub](https://github.com/qldmq)     |
 |<img src="https://github.com/ParkYongHo1.png" width="80"/> | **박용호** | 프론트엔드 개발 | [용호 GitHub](https://github.com/ParkYongHo1) |
-
 
 ---
 
@@ -33,6 +34,7 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 - ✅ **로그인/회원가입** 기능 구현
 - ✅ **MySQL 기반** 데이터 저장
 - ✅ **HTTPS (JKS/PKCS12)** 설정 지원
+- ✅ **Jenkins**를 이용한 **CI/CD 파이프라인** 구축 (**Docker** 환경에서 실행)
 
 ---
 
@@ -50,3 +52,9 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 | **CI/CD**    | Jenkins                       |
 | **Infra**    | AWS EC2, RDS                  |
 
+---
+
+## 🎯 **기대 효과** 
+- ✅ 실무 기반 데이터 분석 UX 시뮬레이션
+- ✅ SQL + JS 데이터 흐름 완전 이해
+- ✅ 시각화 및 조건 설계 역량 증명
