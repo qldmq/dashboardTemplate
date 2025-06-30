@@ -41,6 +41,8 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+
 }
 
 tasks.named('test') {
