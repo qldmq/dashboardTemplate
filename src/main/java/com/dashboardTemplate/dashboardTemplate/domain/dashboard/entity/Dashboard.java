@@ -26,8 +26,8 @@ public class Dashboard {
     @Column(name = "dashboard_name")
     private String dashboardName;
 
-    @Column(name = "database_name")
-    private String databaseName;
+    @Column(name = "table_name")
+    private String tableName;
 
     @Column(name = "dashboard_description")
     private String dashboardDescription;

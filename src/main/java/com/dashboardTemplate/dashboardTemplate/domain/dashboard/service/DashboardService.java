@@ -26,7 +26,7 @@ public class DashboardService {
     private final PasswordEncoder passwordEncoder;
 
     // 대시보드 생성
-    public ResponseEntity<Map<String, Object>> createDashboard(String dashboardName, String databaseName, String dashboardDescription, int companyNum) {
+    public ResponseEntity<Map<String, Object>> createDashboard(String dashboardName, String tableName, String dashboardDescription, int companyNum) {
 
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -38,7 +38,7 @@ public class DashboardService {
                 .dashboardId(id)
                 .companyNum(companyNum)
                 .dashboardName(dashboardName)
-                .databaseName(databaseName)
+                .tableName(tableName)
                 .dashboardDescription(text)
                 .dashboardStatus(DashboardStatus.CREATED)
                 .createdAt(LocalDate.now())

@@ -29,13 +29,13 @@ public class DashboardController {
         log.info("createDashboard api 진입");
 
         String dashboardName = request.getDashboardName();
-        String databaseName = request.getDatabaseName();
+        String tableName = request.getTableName();
         String dashboardDescription = request.getDashboardDescription();
         int companyNum = userDetails.getAuth().getCompanyNum();
 
-        log.info("dashboardName: {}, databaseName: {}, dashboardDescription: {}", dashboardName, databaseName, dashboardDescription);
+        log.info("dashboardName: {}, tableName: {}, dashboardDescription: {}", dashboardName, tableName, dashboardDescription);
 
-        return dashboardService.createDashboard(dashboardName, databaseName, dashboardDescription, companyNum);
+        return dashboardService.createDashboard(dashboardName, tableName, dashboardDescription, companyNum);
     }
 
     @Operation(summary = "대시보드 조회 (페이지네이션)", description = "companyId로 본인이 만든 대시보드를 페이지네이션을 통해 리스트로 조회")
