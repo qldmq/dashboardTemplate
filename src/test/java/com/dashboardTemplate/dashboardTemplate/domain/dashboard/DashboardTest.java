@@ -23,11 +23,11 @@ public class DashboardTest {
     private DashboardController dashboardController;
 
     @Test
-    void getColumnNamesByDatabaseName() {
+    void getColumnNamesByTableName() {
 
-        String databaseName = "samsung_pad";
+        String tableName = "samsung_pad";
 
-        List<String> column = jdbcService.getColumnByDatabaseName(databaseName);
+        List<String> column = jdbcService.getColumnByTableName(tableName);
 
         assertThat(column).isNotEmpty();
         assertThat(column).contains("product_id", "version", "type");

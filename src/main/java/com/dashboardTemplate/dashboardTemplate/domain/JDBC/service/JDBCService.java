@@ -34,7 +34,7 @@ public class JDBCService {
     }
 
     // 테이블에 있는 컬럼명 조회
-    public List<String> getColumnByDatabaseName(String databaseName) {
+    public List<String> getColumnByTableName(String tableName) {
 
         String sql = """
             SELECT column_name
@@ -43,7 +43,7 @@ public class JDBCService {
             ORDER BY ordinal_position
         """;
 
-        List<String> columnsName = jdbcTemplate.queryForList(sql, String.class, databaseName);
+        List<String> columnsName = jdbcTemplate.queryForList(sql, String.class, tableName);
 
         return columnsName;
     }
