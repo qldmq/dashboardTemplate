@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class DashboardService {
                 .tableName(tableName)
                 .dashboardDescription(text)
                 .dashboardStatus(DashboardStatus.CREATED)
-                .createdAt(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .updatedAt(null)
                 .build();
 
