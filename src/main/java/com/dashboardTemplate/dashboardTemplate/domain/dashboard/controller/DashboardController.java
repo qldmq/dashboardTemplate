@@ -50,4 +50,13 @@ public class DashboardController {
 
         return dashboardService.checkDashboardList(companyNum, pageable);
     }
+
+    @Operation(summary = "상세 대시보드 조회", description = "dashboardId와 status를 입력받아 해당하는 대시보드를 조회")
+    @GetMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> checkDashboardDetails(@RequestParam String dashboardId, @RequestParam String status) {
+
+        log.info("checkDashboardDetails api 진입");
+
+        return dashboardService.checkDashboardDetails(dashboardId, status);
+    }
 }
