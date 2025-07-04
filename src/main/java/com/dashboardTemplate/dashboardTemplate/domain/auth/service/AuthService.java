@@ -67,7 +67,7 @@ public class AuthService {
     }
 
     // 회원가입
-    public ResponseEntity<Map<String, Object>> signup(String companyId, String company) {
+    public ResponseEntity<Map<String, Object>> signup(String companyId, String company, String companyEng) {
 
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -85,6 +85,7 @@ public class AuthService {
             Auth auth = new Auth();
             auth.setCompanyId(companyId);
             auth.setCompany(company);
+            auth.setCompanyEng(companyEng);
             authRepository.save(auth);
 
             responseMap.put("message", "회원가입이 완료되었습니다.");

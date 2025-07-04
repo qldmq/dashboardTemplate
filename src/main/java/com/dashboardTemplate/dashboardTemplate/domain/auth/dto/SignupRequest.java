@@ -13,4 +13,7 @@ public class SignupRequest {
 
     @Schema(description = "company", example = "삼성")
     private String company;
+
+    @Schema(description = "companyEng", example = "samsung")
+    private String companyEng;
 }

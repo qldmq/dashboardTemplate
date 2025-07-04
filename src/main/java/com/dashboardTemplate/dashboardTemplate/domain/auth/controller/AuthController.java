@@ -38,7 +38,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> signup(@RequestBody SignupRequest request) {
         log.info("signup api 진입");
 
-        return authService.signup(request.getCompanyId(), request.getCompany());
+        return authService.signup(request.getCompanyId(), request.getCompany(), request.getCompanyEng());
     }
     
     // 로그인
