@@ -1,10 +1,8 @@
 package com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,14 +11,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "aggregated_data")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AggregatedData {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "aggregated_id")
     private Integer aggregatedId;
 
     @Column(name = "aggregated_database_column")
-    private String databaseColumn;
+    private String aggregatedDatabaseColumn;
 
     @Column(name = "data_type")
     private String dataType;
@@ -28,8 +28,8 @@ public class AggregatedData {
     @Column(name = "database_column_alias")
     private String databaseColumnAlias;
 
-    @Column(name = "condition")
-    private String condition;
+    @Column(name = "dashboard_condition")
+    private String dashboardCondition;
 
     @Column(name = "condition_value")
     private String conditionValue;
