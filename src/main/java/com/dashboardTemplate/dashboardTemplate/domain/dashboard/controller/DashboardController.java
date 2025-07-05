@@ -2,6 +2,7 @@ package com.dashboardTemplate.dashboardTemplate.domain.dashboard.controller;
 
 import com.dashboardTemplate.dashboardTemplate.config.UserDetailsImpl;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.CreateRequestDto;
+import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.UpdateDashboardDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -58,5 +59,18 @@ public class DashboardController {
         log.info("checkDashboardDetails api 진입");
 
         return dashboardService.checkDashboardDetails(dashboardId, status);
+    }
+
+    @Operation(summary = "대시보드 수정", description = "대시보드 내용 수정")
+    @PatchMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> updateDashboard(@RequestBody UpdateDashboardDto updateDashboardDto) {
+        
+        log.info("updateDashboard api 진입");
+
+        String dashboardId = updateDashboardDto.getDashboardId();
+        UpdateDashboardDto.GroupDataDto groupDataDto = updateDashboardDto.getGroupData();
+        UpdateDashboardDto.AggregatedDataDto aggregatedDataDto = updateDashboardDto.getAggregatedData();
+
+        return dashboardService.updateDashboard(dashboardId, groupDataDto, aggregatedDataDto);
     }
 }

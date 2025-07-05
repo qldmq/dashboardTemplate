@@ -1,10 +1,8 @@
 package com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,9 +11,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "group_data")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class GroupData {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "group_id")
     private Integer groupId;
 

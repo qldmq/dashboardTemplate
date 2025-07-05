@@ -1,6 +1,7 @@
 package com.dashboardTemplate.dashboardTemplate.domain.dashboard.service;
 
 import com.dashboardTemplate.dashboardTemplate.domain.JDBC.service.JDBCService;
+import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.UpdateDashboardDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity.AggregatedData;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity.Dashboard;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity.DashboardStatus;
@@ -117,10 +118,10 @@ public class DashboardService {
 
                     Map<String, Object> aggregatedDataMap = new LinkedHashMap<>();
                     aggregatedDataMap.put("aggregatedId", aggregatedData.getAggregatedId());
-                    aggregatedDataMap.put("aggregatedDatabaseColumn", aggregatedData.getDatabaseColumn());
+                    aggregatedDataMap.put("aggregatedDatabaseColumn", aggregatedData.getAggregatedDatabaseColumn());
                     aggregatedDataMap.put("dataType", aggregatedData.getDataType());
                     aggregatedDataMap.put("databaseColumnAlias", aggregatedData.getDatabaseColumnAlias());
-                    aggregatedDataMap.put("condition", aggregatedData.getCondition());
+                    aggregatedDataMap.put("dashboardCondition", aggregatedData.getDashboardCondition());
                     aggregatedDataMap.put("conditionValue", aggregatedData.getConditionValue());
                     aggregatedDataMap.put("statMethod", aggregatedData.getStatMethod());
 
@@ -135,6 +136,42 @@ public class DashboardService {
                 }
             }
 
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            responseMap.put("message", "서버오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
+
+    // 대시보드 수정
+    public ResponseEntity<Map<String, Object>> updateDashboard(String dashboardId,
+                                                               UpdateDashboardDto.GroupDataDto groupData,
+                                                               UpdateDashboardDto.AggregatedDataDto aggregatedData) {
+
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+
+        try {
+            GroupData gdb = GroupData.builder()
+                    .databaseColumn(groupData.getDatabaseColumn())
+                    .databaseColumnAlias(groupData.getDatabaseColumnAlias())
+                    .data(groupData.getData())
+                    .dashboardId(dashboardId)
+                    .build();
+
+            AggregatedData arb = AggregatedData.builder()
+                    .aggregatedDatabaseColumn(aggregatedData.getAggregatedDatabaseColumn())
+                    .dataType(aggregatedData.getDataType())
+                    .databaseColumnAlias(aggregatedData.getDatabaseColumnAlias())
+                    .dashboardCondition(aggregatedData.getDashboardCondition())
+                    .conditionValue(aggregatedData.getConditionValue())
+                    .statMethod(aggregatedData.getStatMethod())
+                    .dashboardId(dashboardId)
+                    .build();
+
+            groupDataRepository.save(gdb);
+            aggregatedDataRepository.save(arb);
+
+            responseMap.put("message", "성공");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
             responseMap.put("message", "서버오류: " + e.getMessage());
