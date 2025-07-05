@@ -81,20 +81,25 @@ public class DashboardService {
         Map<String, Object> responseMap = new LinkedHashMap<>();
 
         try {
-            Optional<Dashboard> optionalInfo = (dashboardRepository.findDashboardByDashboardId(dashboardId));
-            Dashboard dashboardInfo = optionalInfo.get();
+            if ("COMPLETED".equalsIgnoreCase(status) || "CREATED".equalsIgnoreCase(status)){
+                Optional<Dashboard> optionalInfo = (dashboardRepository.findDashboardByDashboardId(dashboardId));
+                Dashboard dashboardInfo = optionalInfo.get();
 
-            List<Map<String, String>> databaseColumnList = jdbcService.getColumnByTableName(dashboardInfo.getTableName());
-            Map<String, String> dashboardDefaultInfo = new LinkedHashMap<>();
+                List<Map<String, String>> databaseColumnList = jdbcService.getColumnByTableName(dashboardInfo.getTableName());
+                Map<String, String> dashboardDefaultInfo = new LinkedHashMap<>();
 
-            dashboardDefaultInfo.put("dashboardName", dashboardInfo.getDashboardName());
-            dashboardDefaultInfo.put("tableName", dashboardInfo.getTableName());
-            dashboardDefaultInfo.put("dashboardDescription", dashboardInfo.getDashboardDescription());
+                dashboardDefaultInfo.put("dashboardName", dashboardInfo.getDashboardName());
+                dashboardDefaultInfo.put("tableName", dashboardInfo.getTableName());
+                dashboardDefaultInfo.put("dashboardDescription", dashboardInfo.getDashboardDescription());
 
-            responseMap.put("createdAt", optionalInfo.get().getCreatedAt());
-            responseMap.put("updatedAt", optionalInfo.get().getUpdatedAt());
-            responseMap.put("databaseColumnList", databaseColumnList);
-            responseMap.put("dashboardDefaultInfo", dashboardDefaultInfo);
+                responseMap.put("createdAt", optionalInfo.get().getCreatedAt());
+                responseMap.put("updatedAt", optionalInfo.get().getUpdatedAt());
+                responseMap.put("databaseColumnList", databaseColumnList);
+                responseMap.put("dashboardDefaultInfo", dashboardDefaultInfo);
+            } else {
+                responseMap.put("message", "올바른 상태를 입력해주세요");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
+            }
 
             if ("COMPLETED".equalsIgnoreCase(status)) {
                 Optional<GroupData> groupDataOpt = groupDataRepository.findByDashboardId(dashboardId);
