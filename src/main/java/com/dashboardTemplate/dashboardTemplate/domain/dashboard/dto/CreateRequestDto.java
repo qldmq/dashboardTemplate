@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateRequestDto {
 
-    @Schema(description = "dashboardName", example = "대시보드1")
+    @Schema(description = "dashboardName", example = "대시보드명 | ex: ")
     private String dashboardName;
 
-    @Schema(description = "tableName", example = "1번테이블")
+    @Schema(description = "tableName", example = "테이블명 | ex: ")
     private String tableName;
 
-    @Schema(description = "dashboardDescription", example = "대시보드 설명입니다.")
+    @Schema(description = "dashboardDescription", example = "대시보드 설명 | ex: 대시보드 설명입니다.")
     private String dashboardDescription;
 }
