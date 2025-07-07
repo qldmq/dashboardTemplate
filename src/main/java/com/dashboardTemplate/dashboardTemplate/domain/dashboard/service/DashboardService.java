@@ -9,6 +9,7 @@ import com.dashboardTemplate.dashboardTemplate.domain.dashboard.entity.GroupData
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.repository.AggregatedDataRepository;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.repository.DashboardRepository;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.repository.GroupDataRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -177,5 +178,30 @@ public class DashboardService {
             responseMap.put("message", "서버오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
+    }
+
+    // 대시보드 삭제
+    @Transactional
+    public ResponseEntity<Map<String, Object>> deleteDashboard(int companyNum, String dashboardId) {
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+
+        Dashboard dashboard = dashboardRepository.findDashboardByDashboardId(dashboardId)
+                .orElseThrow(() -> new NoSuchElementException("해당 대시보드가 존재하지 않습니다."));
+
+        if (companyNum != dashboard.getCompanyNum()) {
+            responseMap.put("message", "회원정보가 일치하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
+        }
+
+        groupDataRepository.findByDashboardId(dashboardId)
+                .ifPresent(groupDataRepository::delete);
+
+        aggregatedDataRepository.findByDashboardId(dashboardId)
+                .ifPresent(aggregatedDataRepository::delete);
+
+        dashboardRepository.delete(dashboard);
+
+        responseMap.put("message", "삭제가 완료되었습니다.");
+        return ResponseEntity.ok(responseMap);
     }
 }

@@ -2,6 +2,7 @@ package com.dashboardTemplate.dashboardTemplate.domain.dashboard.controller;
 
 import com.dashboardTemplate.dashboardTemplate.config.UserDetailsImpl;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.CreateRequestDto;
+import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.DeleteDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.UpdateDashboardDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,5 +73,17 @@ public class DashboardController {
         UpdateDashboardDto.AggregatedDataDto aggregatedDataDto = updateDashboardDto.getAggregatedData();
 
         return dashboardService.updateDashboard(dashboardId, groupDataDto, aggregatedDataDto);
+    }
+
+    @Operation(summary = "대시보드 삭제", description = "대시보드 삭제")
+    @DeleteMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> deleteMapping(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody DeleteDto deleteDto) {
+
+        log.info("deleteDashboard api 진입");
+
+        int companyNum = userDetails.getAuth().getCompanyNum();
+        String dashboardId = deleteDto.getDashboardId();
+
+        return dashboardService.deleteDashboard(companyNum, dashboardId );
     }
 }
