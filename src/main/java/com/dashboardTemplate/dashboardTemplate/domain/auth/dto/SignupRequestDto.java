@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class SignupRequest {
+public class SignupRequestDto {
 
-    @Schema(description = "companyId", example = "samsung_id")
+    @Schema(description = "companyId", example = "기업 아이디 | ex: test_id")
     private String companyId;
 
-    @Schema(description = "company", example = "삼성")
+    @Schema(description = "company", example = "기업명 | ex: 테스트기업")
     private String company;
 
-    @Schema(description = "companyEng", example = "samsung")
+    @Schema(description = "companyEng", example = "기업명(영어로) | ex: testCompany")
     private String companyEng;
 }

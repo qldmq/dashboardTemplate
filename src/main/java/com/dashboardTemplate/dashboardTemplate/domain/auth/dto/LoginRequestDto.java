@@ -6,14 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginRequestDto {
 
-    @Schema(description = "companyId", example = "samsung_id")
+    @Schema(description = "companyId", example = "기업 아이디 | ex: test_id")
     private String companyId;
 }
