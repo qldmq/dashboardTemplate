@@ -11,6 +11,8 @@ public class UpdateDashboardDto {
 
     private GroupDataDto groupData;
     private AggregatedDataDto aggregatedData;
+
+    @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$kTST1JAU2Dyou4qBkP8ipu.HcKlVmK65z.o3brkSrVh4mHMcz1s0m")
     private String dashboardId;
 
     @Getter
