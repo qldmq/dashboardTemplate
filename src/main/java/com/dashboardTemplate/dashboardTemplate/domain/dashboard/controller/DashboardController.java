@@ -6,6 +6,7 @@ import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.DeleteDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.UpdateDashboardDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -89,7 +90,8 @@ public class DashboardController {
     
     @Operation(summary = "그룹데이터 조회", description = "그룹데이터 조회")
     @GetMapping("/groupData")
-    public ResponseEntity<Map<String, Object>> getDashboardGroupData(@RequestParam String columnName, @RequestParam String tableName) {
+    public ResponseEntity<Map<String, Object>> getDashboardGroupData(@Parameter(name = "columnName", description = "조회할 컬럼명", example = "age") @RequestParam String columnName,
+                                                                     @Parameter(name = "tableName", description = "조회할 테이블명", example = "test_phone") @RequestParam String tableName) {
 
         log.info("getDashboardGroupData api 진입");
 
