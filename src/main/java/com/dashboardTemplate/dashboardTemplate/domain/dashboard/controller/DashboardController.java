@@ -3,7 +3,6 @@ package com.dashboardTemplate.dashboardTemplate.domain.dashboard.controller;
 import com.dashboardTemplate.dashboardTemplate.config.UserDetailsImpl;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.CreateRequestDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.DeleteDto;
-import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.GroupDataRequestDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.dto.UpdateDashboardDto;
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -90,12 +89,9 @@ public class DashboardController {
     
     @Operation(summary = "그룹데이터 조회", description = "그룹데이터 조회")
     @GetMapping("/groupData")
-    public ResponseEntity<Map<String, Object>> getDashboardGroupData(@RequestBody GroupDataRequestDto groupDataRequestDto) {
+    public ResponseEntity<Map<String, Object>> getDashboardGroupData(@RequestParam String columnName, @RequestParam String tableName) {
 
         log.info("getDashboardGroupData api 진입");
-
-        String columnName = groupDataRequestDto.getColumnName();
-        String tableName = groupDataRequestDto.getTableName();
 
         return dashboardService.dashboardGroupData(columnName, tableName);
     }
