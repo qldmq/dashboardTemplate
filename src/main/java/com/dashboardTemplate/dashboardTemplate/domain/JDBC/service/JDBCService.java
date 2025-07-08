@@ -69,4 +69,11 @@ public class JDBCService {
             default -> "object";
         };
     }
+
+    public List<Object> getGroupDataByColumn(String columnName, String tableName) {
+
+        String sql = String.format("SELECT DISTINCT `%s` FROM `%s`", columnName, tableName);
+
+        return jdbcTemplate.queryForList(sql, Object.class);
+    }
 }

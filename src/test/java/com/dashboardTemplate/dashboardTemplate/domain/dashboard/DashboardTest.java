@@ -23,6 +23,7 @@ public class DashboardTest {
     @Autowired
     private DashboardController dashboardController;
 
+    // 테이블명에 들어있는 컬럼명 조회 테스트
     @Test
     void getColumnNamesByTableName() {
 
@@ -33,5 +34,17 @@ public class DashboardTest {
         assertThat(column).isNotEmpty();
 
         log.info("조회된 컬럼: {}", column);
+    }
+
+    // 컬럼에 들어있는 데이터 조회 테스트
+    @Test
+    void getGroupDataByColumnName() {
+
+        String tableName = "test_phone";
+        String columnName = "age";
+
+        List<Object> data = jdbcService.getGroupDataByColumn(columnName, tableName);
+
+        log.info("조회된 컬럼: {}", data);
     }
 }
