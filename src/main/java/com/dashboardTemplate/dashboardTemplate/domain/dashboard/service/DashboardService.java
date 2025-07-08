@@ -204,4 +204,20 @@ public class DashboardService {
         responseMap.put("message", "삭제가 완료되었습니다.");
         return ResponseEntity.ok(responseMap);
     }
+
+    // 대시보드 그룹 항목의 데이터 조회
+    public ResponseEntity<Map<String, Object>> dashboardGroupData(String columnName, String tableName) {
+
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+
+        try {
+            List<Object> groupData = jdbcService.getGroupDataByColumn(columnName, tableName);
+
+            responseMap.put("groupData", groupData);
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            responseMap.put("message", "서버 에러: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
 }
