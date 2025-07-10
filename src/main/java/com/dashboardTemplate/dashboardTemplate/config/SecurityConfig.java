@@ -69,7 +69,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("https://rag-dashboard-console.vercel.app",
                 "http://localhost:5173",
                 "https://dashboardtemplate.duckdns.org"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
