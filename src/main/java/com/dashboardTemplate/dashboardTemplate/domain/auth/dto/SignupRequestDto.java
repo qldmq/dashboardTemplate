@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SignupRequestDto {
 
-    @Schema(description = "companyId", example = "기업 아이디 | ex: test_id")
+    @Schema(description = "companyId", example = "test_id1")
     private String companyId;
 
-    @Schema(description = "company", example = "기업명 | ex: 테스트기업")
+    @Schema(description = "company", example = "테스트기업1")
     private String company;
 
-    @Schema(description = "companyEng", example = "기업명(영어로) | ex: testCompany")
+    @Schema(description = "companyEng", example = "testCompany1")
     private String companyEng;
 }

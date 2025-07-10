@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class DeleteDto {
 
-    @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: ")
+    @Schema(description = "dashboardId", example = "test_id4")
     private String dashboardId;
 }

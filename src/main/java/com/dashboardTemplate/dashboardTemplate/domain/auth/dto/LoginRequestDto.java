@@ -12,6 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginRequestDto {
 
-    @Schema(description = "companyId", example = "기업 아이디 | ex: test_id")
+    @Schema(description = "companyId", example = "test_id")
     private String companyId;
 }

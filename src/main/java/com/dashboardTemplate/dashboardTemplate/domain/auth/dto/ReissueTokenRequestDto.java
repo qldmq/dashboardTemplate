@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class ReissueTokenRequestDto {
 
-    @Schema(description = "refreshToken", example = "리프레시 토큰 | ex: eyJhbGciOiJHAm5O7c..")
+    @Schema(description = "refreshToken", example = "eyJhbGciOiJHAm5O7c..")
     private String refreshToken;
 }
