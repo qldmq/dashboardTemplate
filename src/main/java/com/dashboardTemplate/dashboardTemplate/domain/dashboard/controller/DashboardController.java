@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -70,10 +71,10 @@ public class DashboardController {
         log.info("updateDashboard api 진입");
 
         String dashboardId = updateDashboardDto.getDashboardId();
-        UpdateDashboardDto.GroupDataDto groupDataDto = updateDashboardDto.getGroupData();
-        UpdateDashboardDto.AggregatedDataDto aggregatedDataDto = updateDashboardDto.getAggregatedData();
+        List<UpdateDashboardDto.GroupDataDto> groupDataList = updateDashboardDto.getGroupData();
+        List<UpdateDashboardDto.AggregatedDataDto> aggregatedDataList = updateDashboardDto.getAggregatedData();
 
-        return dashboardService.updateDashboard(dashboardId, groupDataDto, aggregatedDataDto);
+        return dashboardService.updateDashboard(dashboardId, groupDataList, aggregatedDataList);
     }
 
     @Operation(summary = "대시보드 삭제", description = "대시보드 삭제")

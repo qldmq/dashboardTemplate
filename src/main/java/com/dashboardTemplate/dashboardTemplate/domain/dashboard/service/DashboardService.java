@@ -145,35 +145,50 @@ public class DashboardService {
     }
 
     // 대시보드 수정
+    @Transactional
     public ResponseEntity<Map<String, Object>> updateDashboard(String dashboardId,
-                                                               UpdateDashboardDto.GroupDataDto groupData,
-                                                               UpdateDashboardDto.AggregatedDataDto aggregatedData) {
+                                                               List<UpdateDashboardDto.GroupDataDto> groupDataList,
+                                                               List<UpdateDashboardDto.AggregatedDataDto> aggregatedDataList) {
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
 
+
+
         try {
-            GroupData gdb = GroupData.builder()
-                    .databaseColumn(groupData.getDatabaseColumn())
-                    .databaseColumnAlias(groupData.getDatabaseColumnAlias())
-                    .data(groupData.getData())
-                    .dashboardId(dashboardId)
-                    .build();
 
-            AggregatedData arb = AggregatedData.builder()
-                    .aggregatedDatabaseColumn(aggregatedData.getAggregatedDatabaseColumn())
-                    .dataType(aggregatedData.getDataType())
-                    .databaseColumnAlias(aggregatedData.getDatabaseColumnAlias())
-                    .dashboardCondition(aggregatedData.getDashboardCondition())
-                    .conditionValue(aggregatedData.getConditionValue())
-                    .statMethod(aggregatedData.getStatMethod())
-                    .dashboardId(dashboardId)
-                    .build();
+            groupDataRepository.deleteByDashboardId(dashboardId);
+            aggregatedDataRepository.deleteByDashboardId(dashboardId);
 
-            groupDataRepository.save(gdb);
-            aggregatedDataRepository.save(arb);
+            for (UpdateDashboardDto.GroupDataDto groupData : groupDataList) {
+                GroupData gd = GroupData.builder()
+                        .groupId(groupData.getGroupId())
+                        .databaseColumn(groupData.getDatabaseColumn())
+                        .databaseColumnAlias(groupData.getDatabaseColumnAlias())
+                        .data(groupData.getData())
+                        .dashboardId(dashboardId)
+                        .build();
+
+                groupDataRepository.save(gd);
+            }
+
+            for (UpdateDashboardDto.AggregatedDataDto aggregatedData : aggregatedDataList) {
+                AggregatedData ar = AggregatedData.builder()
+                        .aggregatedId(aggregatedData.getAggregatedId())
+                        .aggregatedDatabaseColumn(aggregatedData.getAggregatedDatabaseColumn())
+                        .dataType(aggregatedData.getDataType())
+                        .databaseColumnAlias(aggregatedData.getDatabaseColumnAlias())
+                        .dashboardCondition(aggregatedData.getDashboardCondition())
+                        .conditionValue(aggregatedData.getConditionValue())
+                        .statMethod(aggregatedData.getStatMethod())
+                        .dashboardId(dashboardId)
+                        .build();
+
+                aggregatedDataRepository.save(ar);
+            }
 
             responseMap.put("message", "성공");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+
         } catch (Exception e) {
             responseMap.put("message", "서버오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);

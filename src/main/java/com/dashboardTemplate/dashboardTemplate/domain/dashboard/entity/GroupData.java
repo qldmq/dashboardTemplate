@@ -16,6 +16,9 @@ public class GroupData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "group_num")
+    private Integer groupNum;
+
     @Column(name = "group_id")
     private Integer groupId;
 

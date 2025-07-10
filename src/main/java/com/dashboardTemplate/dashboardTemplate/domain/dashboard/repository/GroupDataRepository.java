@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface GroupDataRepository extends JpaRepository<GroupData, Integer> {
 
     Optional<GroupData> findByDashboardId(String dashboardId);
+
+    void deleteByDashboardId(String dashboardId);
 }
