@@ -85,8 +85,12 @@ public class DashboardService {
         try {
             if ("COMPLETED".equalsIgnoreCase(status) || "CREATED".equalsIgnoreCase(status)){
                 Optional<Dashboard> optionalInfo = (dashboardRepository.findDashboardByDashboardId(dashboardId));
-                Dashboard dashboardInfo = optionalInfo.get();
+                if (optionalInfo.isEmpty()) {
+                    responseMap.put("message", "해당 대시보드를 찾을 수 없습니다.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap);
+                }
 
+                Dashboard dashboardInfo = optionalInfo.get();
                 List<Map<String, String>> databaseColumnList = jdbcService.getColumnByTableName(dashboardInfo.getTableName());
                 Map<String, String> dashboardDefaultInfo = new LinkedHashMap<>();
 
@@ -104,37 +108,36 @@ public class DashboardService {
             }
 
             if ("COMPLETED".equalsIgnoreCase(status)) {
-                Optional<GroupData> groupDataOpt = groupDataRepository.findByDashboardId(dashboardId);
-                Optional<AggregatedData> aggregatedDataOpt = aggregatedDataRepository.findByDashboardId(dashboardId);
+                List<GroupData> groupDataList = groupDataRepository.findByDashboardId(dashboardId);
+                List<AggregatedData> aggregatedDataList = aggregatedDataRepository.findByDashboardId(dashboardId);
 
-                if (groupDataOpt.isPresent() && aggregatedDataOpt.isPresent()) {
-                    GroupData groupData = groupDataOpt.get();
-                    AggregatedData aggregatedData = aggregatedDataOpt.get();
-
-                    Map<String, Object> groupDataMap = new LinkedHashMap<>();
-                    groupDataMap.put("groupId", groupData.getGroupId());
-                    groupDataMap.put("databaseColumn", groupData.getDatabaseColumn());
-                    groupDataMap.put("databaseColumnAlias", groupData.getDatabaseColumnAlias());
-                    groupDataMap.put("data", groupData.getData());
-
-                    Map<String, Object> aggregatedDataMap = new LinkedHashMap<>();
-                    aggregatedDataMap.put("aggregatedId", aggregatedData.getAggregatedId());
-                    aggregatedDataMap.put("aggregatedDatabaseColumn", aggregatedData.getAggregatedDatabaseColumn());
-                    aggregatedDataMap.put("dataType", aggregatedData.getDataType());
-                    aggregatedDataMap.put("databaseColumnAlias", aggregatedData.getDatabaseColumnAlias());
-                    aggregatedDataMap.put("dashboardCondition", aggregatedData.getDashboardCondition());
-                    aggregatedDataMap.put("conditionValue", aggregatedData.getConditionValue());
-                    aggregatedDataMap.put("statMethod", aggregatedData.getStatMethod());
-
-                    Map<String, Object> dashboardDetailInfo = new LinkedHashMap<>();
-                    dashboardDetailInfo.put("groupData", groupDataMap);
-                    dashboardDetailInfo.put("aggregatedData", aggregatedDataMap);
-
-                    responseMap.put("dashboardDetailInfo", dashboardDetailInfo);
-                } else {
-                    responseMap.put("dashboardDetailInfo", null);
-                    responseMap.put("message", "GroupData 또는 AggregatedData를 찾을 수 없습니다.");
+                List<Map<String, Object>> groupDataMaps = new ArrayList<>();
+                for (GroupData groupData : groupDataList) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("groupId", groupData.getGroupId());
+                    map.put("databaseColumn", groupData.getDatabaseColumn());
+                    map.put("databaseColumnAlias", groupData.getDatabaseColumnAlias());
+                    map.put("data", groupData.getData());
+                    groupDataMaps.add(map);
                 }
+
+                List<Map<String, Object>> aggregatedDataMaps = new ArrayList<>();
+                for (AggregatedData aggregatedData : aggregatedDataList) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("aggregatedId", aggregatedData.getAggregatedId());
+                    map.put("aggregatedDatabaseColumn", aggregatedData.getAggregatedDatabaseColumn());
+                    map.put("dataType", aggregatedData.getDataType());
+                    map.put("databaseColumnAlias", aggregatedData.getDatabaseColumnAlias());
+                    map.put("dashboardCondition", aggregatedData.getDashboardCondition());
+                    map.put("conditionValue", aggregatedData.getConditionValue());
+                    map.put("statMethod", aggregatedData.getStatMethod());
+                    aggregatedDataMaps.add(map);
+                }
+                Map<String, Object> dashboardDetailInfo = new LinkedHashMap<>();
+                dashboardDetailInfo.put("groupData", groupDataMaps);
+                dashboardDetailInfo.put("aggregatedData", aggregatedDataMaps);
+
+                responseMap.put("dashboardDetailInfo", dashboardDetailInfo);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
@@ -151,8 +154,6 @@ public class DashboardService {
                                                                List<UpdateDashboardDto.AggregatedDataDto> aggregatedDataList) {
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
-
-
 
         try {
 
@@ -208,11 +209,15 @@ public class DashboardService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
         }
 
-        groupDataRepository.findByDashboardId(dashboardId)
-                .ifPresent(groupDataRepository::delete);
+        List<GroupData> groupDataList = groupDataRepository.findByDashboardId(dashboardId);
+        if (!groupDataList.isEmpty()) {
+            groupDataRepository.deleteAll(groupDataList);
+        }
 
-        aggregatedDataRepository.findByDashboardId(dashboardId)
-                .ifPresent(aggregatedDataRepository::delete);
+        List<AggregatedData> aggregatedDataList = aggregatedDataRepository.findByDashboardId(dashboardId);
+        if (!aggregatedDataList.isEmpty()) {
+            aggregatedDataRepository.deleteAll(aggregatedDataList);
+        }
 
         dashboardRepository.delete(dashboard);
 
