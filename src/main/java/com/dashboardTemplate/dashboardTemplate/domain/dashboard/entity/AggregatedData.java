@@ -16,6 +16,9 @@ public class AggregatedData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "aggregated_num")
+    private Integer aggregatedNum;
+
     @Column(name = "aggregated_id")
     private Integer aggregatedId;
 

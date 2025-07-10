@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface AggregatedDataRepository extends JpaRepository<AggregatedData, Integer> {
 
     Optional<AggregatedData> findByDashboardId(String dashboardId);
+
+    void deleteByDashboardId(String dashboardId);
 }
