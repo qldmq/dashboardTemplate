@@ -14,13 +14,14 @@ public class UpdateDashboardDto {
     private List<GroupDataDto> groupData;
     private List<AggregatedDataDto> aggregatedData;
 
-    @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$kTST1JAU2Dyou4qBkP8ipu.HcKlVmK65z.o3brkSrVh4mHMcz1s0m")
+    @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$dkCd.6yQRGSdXuUbMgzDO.z1B3cAP/qI323xfkuqTYUUdN4kv4lt2")
     private String dashboardId;
 
     @Getter
     @Setter
     public static class GroupDataDto {
 
+        @Schema(description = "groupId", example = "그룹 아이디 | ex: 1")
         private int groupId;
 
         @Schema(description = "databaseColumn", example = "그룹 컬럼명 | ex: age")
@@ -32,7 +33,7 @@ public class UpdateDashboardDto {
         @Schema(description = "data", example = "데이터 | ex: 25")
         private String data;
 
-        @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$kTST1JAU2Dyou4qBkP8ipu.HcKlVmK65z.o3brkSrVh4mHMcz1s0m")
+        @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$dkCd.6yQRGSdXuUbMgzDO.z1B3cAP/qI323xfkuqTYUUdN4kv4lt2")
         private String dashboardId;
     }
 
@@ -40,6 +41,7 @@ public class UpdateDashboardDto {
     @Setter
     public static class AggregatedDataDto {
 
+        @Schema(description = "aggregatedId", example = "조건 아이디 | ex: 1")
         private int aggregatedId;
 
         @Schema(description = "aggregatedDatabaseColumn", example = "조건컬럼명 | ex: age")
@@ -60,7 +62,7 @@ public class UpdateDashboardDto {
         @Schema(description = "statMethod", example = "통계 방법 | ex: 개수")
         private String statMethod;
 
-        @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$kTST1JAU2Dyou4qBkP8ipu.HcKlVmK65z.o3brkSrVh4mHMcz1s0m")
+        @Schema(description = "dashboardId", example = "대시보드 아이디 | ex: $2a$10$dkCd.6yQRGSdXuUbMgzDO.z1B3cAP/qI323xfkuqTYUUdN4kv4lt2")
         private String dashboardId;
     }
 }
