@@ -157,6 +157,10 @@ public class DashboardService {
 
         try {
 
+            Dashboard dashboard = dashboardRepository.findDashboardByDashboardId(dashboardId)
+                    .orElseThrow(() -> new NoSuchElementException("해당 대시보드가 존재하지 않습니다."));
+            dashboard.setUpdatedAt(LocalDateTime.now());
+
             groupDataRepository.deleteByDashboardId(dashboardId);
             aggregatedDataRepository.deleteByDashboardId(dashboardId);
 
