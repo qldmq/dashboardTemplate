@@ -60,7 +60,7 @@ public class DashboardService {
 
             dashboardRepository.save(dashboard);
 
-            log.info("저장이 완료되었습니다.");
+            log.info("저장이 완료되었습니다. 대시보드 아이디: {}", id);
             responseMap.put("message", "저장이 완료되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
