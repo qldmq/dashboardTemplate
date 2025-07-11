@@ -34,6 +34,7 @@ public class AuthService {
 
         try {
             if (!jwtTokenProvider.validateToken(refreshToken)) {
+                log.warn("RefreshToken이 유효하지 않습니다.");
                 responseMap.put("message", "RefreshToken이 유효하지 않습니다.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
             }
@@ -42,11 +43,13 @@ public class AuthService {
             String redisRefreshToken = redisTemplate.opsForValue().get("RT:" + companyId);
 
             if (redisRefreshToken == null) {
+                log.warn("로그인 정보가 없습니다.");
                 responseMap.put("message", "로그인 정보가 없습니다. 다시 로그인해주세요.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
             }
 
             if (!redisRefreshToken.equals(refreshToken)) {
+                log.warn("RefreshToken이 일치하지 않습니다.");
                 responseMap.put("message", "RefreshToken이 일치하지 않습니다.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMap);
             }
@@ -59,6 +62,7 @@ public class AuthService {
             responseMap.put("accessTokenExpiresAt", expirationTime);
             responseMap.put("message", "토큰이 재발급되었습니다.");
 
+            log.info("토큰이 재발급되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
             log.error("토큰 재발급 중 예외 발생", e);
@@ -74,11 +78,13 @@ public class AuthService {
 
         try {
             if (authRepository.existsByCompanyId(companyId)) {
+                log.warn("이미 존재하는 아이디입니다.");
                 responseMap.put("message", "이미 존재하는 아이디입니다.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
             }
 
             if (authRepository.existsByCompany(company)) {
+                log.warn("이미 존재하는 회사입니다.");
                 responseMap.put("message", "이미 존재하는 회사입니다.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
             }
@@ -89,6 +95,7 @@ public class AuthService {
             auth.setCompanyEng(companyEng);
             authRepository.save(auth);
 
+            log.info("회원가입이 완료되었습니다.");
             responseMap.put("message", "회원가입이 완료되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
@@ -106,6 +113,7 @@ public class AuthService {
 
         try {
             if (companyOptional.isEmpty()) {
+                log.warn("사용자를 찾을 수 없습니다.");
                 responseMap.put("message", "사용자를 찾을 수 없습니다.");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
             }
@@ -134,6 +142,7 @@ public class AuthService {
             responseMap.put("accessTokenExpiresAt", expirationTime);
             responseMap.put("message", "로그인 성공");
 
+            log.info("로그인 성공");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
             log.error("로그인 중 예외 발생", e);
@@ -172,6 +181,7 @@ public class AuthService {
                 }
             }
 
+            log.info("로그아웃되었습니다.");
             responseMap.put("message", "로그아웃되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {

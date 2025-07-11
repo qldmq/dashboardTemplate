@@ -40,25 +40,32 @@ public class DashboardService {
 
         Map<String, Object> responseMap = new HashMap<>();
 
-        int randNum = secureRandom.nextInt(900000) + 100000;
-        String id = passwordEncoder.encode(String.valueOf(randNum));
-        String text = (dashboardDescription.isEmpty() || dashboardDescription == null) ? "-" : dashboardDescription;
+        try {
+            int randNum = secureRandom.nextInt(900000) + 100000;
+            String id = passwordEncoder.encode(String.valueOf(randNum));
+            String text = (dashboardDescription.isEmpty() || dashboardDescription == null) ? "-" : dashboardDescription;
 
-        Dashboard dashboard = Dashboard.builder()
-                .dashboardId(id)
-                .companyNum(companyNum)
-                .dashboardName(dashboardName)
-                .tableName(tableName)
-                .dashboardDescription(text)
-                .dashboardStatus(DashboardStatus.CREATED)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(null)
-                .build();
+            Dashboard dashboard = Dashboard.builder()
+                    .dashboardId(id)
+                    .companyNum(companyNum)
+                    .dashboardName(dashboardName)
+                    .tableName(tableName)
+                    .dashboardDescription(text)
+                    .dashboardStatus(DashboardStatus.CREATED)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(null)
+                    .build();
 
-        dashboardRepository.save(dashboard);
+            dashboardRepository.save(dashboard);
 
-        responseMap.put("message", "저장이 완료되었습니다.");
-        return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+            log.info("저장이 완료되었습니다.");
+            responseMap.put("message", "저장이 완료되었습니다.");
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            log.error("대시보드 생성 중 예외 발생", e);
+            responseMap.put("message", "서버 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
     }
 
     // 대시보드 조회
@@ -73,6 +80,7 @@ public class DashboardService {
             responseMap.put("currentPage", dashboardPage.getNumber() + 1); // 현재 페이지 번호
             responseMap.put("dashboardList", dashboardPage.getContent());
 
+            log.info("대시보드 리스트 조회가 완료되었습니다.");
             return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
             log.error("대시보드 리스트 조회 중 예외 발생", e);
@@ -89,6 +97,7 @@ public class DashboardService {
             if ("COMPLETED".equalsIgnoreCase(status) || "CREATED".equalsIgnoreCase(status)){
                 Optional<Dashboard> optionalInfo = (dashboardRepository.findDashboardByDashboardId(dashboardId));
                 if (optionalInfo.isEmpty()) {
+                    log.warn("해당 대시보드를 찾을 수 없습니다.");
                     responseMap.put("message", "해당 대시보드를 찾을 수 없습니다.");
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap);
                 }
@@ -106,6 +115,7 @@ public class DashboardService {
                 responseMap.put("databaseColumnList", databaseColumnList);
                 responseMap.put("dashboardDefaultInfo", dashboardDefaultInfo);
             } else {
+                log.warn("올바른 상태를 입력해주세요.");
                 responseMap.put("message", "올바른 상태를 입력해주세요");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMap);
             }
@@ -143,6 +153,7 @@ public class DashboardService {
                 responseMap.put("dashboardDetailInfo", dashboardDetailInfo);
             }
 
+            log.info("상세 대시보드 조회가 완료되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
             log.error("상세 대시보드 조회 중 예외 발생", e);
@@ -195,7 +206,8 @@ public class DashboardService {
                 aggregatedDataRepository.save(ar);
             }
 
-            responseMap.put("message", "성공");
+            log.info("대시보드 수정이 완료되었습니다.");
+            responseMap.put("message", "대시보드 수정이 완료되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
 
         } catch (Exception e) {
