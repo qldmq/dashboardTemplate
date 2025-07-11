@@ -179,8 +179,6 @@ public class DashboardService {
             groupDataRepository.deleteByDashboardId(dashboardId);
             aggregatedDataRepository.deleteByDashboardId(dashboardId);
 
-            dashboard.setDashboardStatus(DashboardStatus.COMPLETED);
-
             for (UpdateDashboardDto.GroupDataDto groupData : groupDataList) {
                 GroupData gd = GroupData.builder()
                         .groupId(groupData.getGroupId())
@@ -207,6 +205,8 @@ public class DashboardService {
 
                 aggregatedDataRepository.save(ar);
             }
+
+            dashboard.setDashboardStatus(DashboardStatus.COMPLETED);
 
             log.info("대시보드 수정이 완료되었습니다.");
             responseMap.put("message", "대시보드 수정이 완료되었습니다.");

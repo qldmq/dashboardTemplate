@@ -71,8 +71,8 @@ public class DashboardController {
         log.info("updateDashboard api 진입");
 
         String dashboardId = updateDashboardDto.getDashboardId();
-        List<UpdateDashboardDto.GroupDataDto> groupDataList = updateDashboardDto.getGroupData();
-        List<UpdateDashboardDto.AggregatedDataDto> aggregatedDataList = updateDashboardDto.getAggregatedData();
+        List<UpdateDashboardDto.GroupDataDto> groupDataList = updateDashboardDto.getDashboardDetailInfo().getGroupData();
+        List<UpdateDashboardDto.AggregatedDataDto> aggregatedDataList = updateDashboardDto.getDashboardDetailInfo().getAggregatedData();
 
         return dashboardService.updateDashboard(dashboardId, groupDataList, aggregatedDataList);
     }

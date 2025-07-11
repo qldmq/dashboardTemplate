@@ -8,14 +8,22 @@ import lombok.Setter;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class UpdateDashboardDto {
 
-    private List<GroupDataDto> groupData;
-    private List<AggregatedDataDto> aggregatedData;
-
     @Schema(description = "dashboardId", example = "$2a$10$dkCd.6yQRGSdXuUbMgzDO.z1B3cAP/qI323xfkuqTYUUdN4kv4lt2")
     private String dashboardId;
+
+    private DashboardDetailInfo dashboardDetailInfo;
+
+    @Getter
+    @Setter
+    public static class DashboardDetailInfo {
+
+        private List<GroupDataDto> groupData;
+        private List<AggregatedDataDto> aggregatedData;
+    }
 
     @Getter
     @Setter
