@@ -95,6 +95,8 @@ public class DashboardService {
     public ResponseEntity<Map<String, Object>> checkDashboardDetails(String dashboardId, String status) {
         Map<String, Object> responseMap = new LinkedHashMap<>();
 
+        log.info("대시보드 아이디: {}", dashboardId);
+
         try {
             if ("COMPLETED".equalsIgnoreCase(status) || "CREATED".equalsIgnoreCase(status)){
                 Optional<Dashboard> optionalInfo = (dashboardRepository.findDashboardByDashboardId(dashboardId));
