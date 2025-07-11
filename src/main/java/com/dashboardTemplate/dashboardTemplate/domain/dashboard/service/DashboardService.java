@@ -11,6 +11,7 @@ import com.dashboardTemplate.dashboardTemplate.domain.dashboard.repository.Dashb
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.repository.GroupDataRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
@@ -73,6 +75,7 @@ public class DashboardService {
 
             return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
+            log.error("대시보드 리스트 조회 중 예외 발생", e);
             responseMap.put("message", "서버 오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
@@ -142,6 +145,7 @@ public class DashboardService {
 
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
+            log.error("상세 대시보드 조회 중 예외 발생", e);
             responseMap.put("message", "서버오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
@@ -195,6 +199,7 @@ public class DashboardService {
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
 
         } catch (Exception e) {
+            log.error("대시보드 수정 중 예외 발생", e);
             responseMap.put("message", "서버오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
@@ -240,6 +245,7 @@ public class DashboardService {
             responseMap.put("groupData", groupData);
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
+            log.error("그룹항목 데이터 조회 중 예외 발생", e);
             responseMap.put("message", "서버 에러: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }

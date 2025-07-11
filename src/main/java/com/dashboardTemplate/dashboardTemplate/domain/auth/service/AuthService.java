@@ -61,6 +61,7 @@ public class AuthService {
 
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
+            log.error("토큰 재발급 중 예외 발생", e);
             responseMap.put("message", "서버 오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
@@ -91,6 +92,7 @@ public class AuthService {
             responseMap.put("message", "회원가입이 완료되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
+            log.error("회원가입 중 예외 발생", e);
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
@@ -134,6 +136,7 @@ public class AuthService {
 
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
+            log.error("로그인 중 예외 발생", e);
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
@@ -172,6 +175,7 @@ public class AuthService {
             responseMap.put("message", "로그아웃되었습니다.");
             return ResponseEntity.status(HttpStatus.OK).body(responseMap);
         } catch (Exception e) {
+            log.error("로그아웃 중 예외 발생", e);
             responseMap.put("message", "서버 오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
