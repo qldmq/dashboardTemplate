@@ -83,6 +83,7 @@ fi
 
 echo '🚀 애플리케이션 실행...'
 sh -c 'nohup java \\
+  -Dfile.encoding=UTF-8 \\
   -Dspring.profiles.active=dev \\
   -Dspring.datasource.url=jdbc:mysql://dashboardtemplate.ctyqackomgq0.ap-northeast-2.rds.amazonaws.com:3306/DashboardTemplate \\
   -Dspring.datasource.username=${DB_USER} \\
