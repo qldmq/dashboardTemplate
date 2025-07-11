@@ -45,6 +45,8 @@ public class DashboardService {
             String id = passwordEncoder.encode(String.valueOf(randNum));
             String text = (dashboardDescription.isEmpty() || dashboardDescription == null) ? "-" : dashboardDescription;
 
+            dashboardName = dashboardName.replaceAll("\\s+", " ").trim();
+
             Dashboard dashboard = Dashboard.builder()
                     .dashboardId(id)
                     .companyNum(companyNum)
