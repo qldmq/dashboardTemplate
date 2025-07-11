@@ -179,6 +179,8 @@ public class DashboardService {
             groupDataRepository.deleteByDashboardId(dashboardId);
             aggregatedDataRepository.deleteByDashboardId(dashboardId);
 
+            dashboard.setDashboardStatus(DashboardStatus.COMPLETED);
+
             for (UpdateDashboardDto.GroupDataDto groupData : groupDataList) {
                 GroupData gd = GroupData.builder()
                         .groupId(groupData.getGroupId())
