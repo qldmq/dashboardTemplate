@@ -47,4 +47,17 @@ public class DashboardTest {
 
         log.info("조회된 컬럼: {}", data);
     }
+
+    // 필터링된 그룹데이터 조회
+    @Test
+    void getFilterGroupData() {
+
+        String tableName=  "test_phone";
+        String dashboardColumn = "version";
+        String data = "iphone 1";
+
+        int cnt = jdbcService.countGroupData(tableName, dashboardColumn, data);
+
+        log.info("조회된 groupData 개수: {}", cnt);
+    }
 }
