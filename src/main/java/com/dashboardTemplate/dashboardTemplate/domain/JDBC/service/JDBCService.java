@@ -76,4 +76,12 @@ public class JDBCService {
 
         return jdbcTemplate.queryForList(sql, Object.class);
     }
+
+    public Integer countGroupData(String tableName, String databaseColumn, String data) {
+
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", tableName, databaseColumn);
+
+
+        return jdbcTemplate.queryForObject(sql, Integer.class, data);
+    }
 }
