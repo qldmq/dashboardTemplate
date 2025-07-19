@@ -98,4 +98,13 @@ public class DashboardController {
 
         return dashboardService.dashboardGroupData(columnName, tableName);
     }
+
+    @Operation(summary = "그룹데이터 필터링 조회", description = "그룹데이터를 필터링하여 조회")
+    @GetMapping("/filterGroupData")
+    public ResponseEntity<Map<String, Object>> getFilterData(String dashboardId) {
+
+        log.info("getFilterData api 진입");
+
+        return dashboardService.filterData(dashboardId);
+    }
 }

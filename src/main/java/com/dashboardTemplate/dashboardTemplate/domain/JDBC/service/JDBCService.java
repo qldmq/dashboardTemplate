@@ -81,7 +81,27 @@ public class JDBCService {
 
         String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", tableName, databaseColumn);
 
-
         return jdbcTemplate.queryForObject(sql, Integer.class, data);
+    }
+
+    public Object filterAggregatedData(String condition, String tableName, String databaseName, String data) {
+
+        String operator = switch (condition) {
+            case "크다" -> ">";
+            case "작다" -> "<";
+            case "크거나 같다" -> ">=";
+            case "작거나 같다" -> "";
+            case "같다" -> "==";
+            case "다르다" -> "!=";
+            case "포함된다" -> "in";
+            case "포함되지 않는다" -> "not in";
+            case "범위 지정" -> "between";
+            case "없음" -> "x";
+            default -> throw new IllegalArgumentException("지원하지 않는 조건입니다.");
+        };
+
+        String sql = String.format("SELECT * FROM %s WHERE %s %s ?", tableName, databaseName, operator);
+
+        return jdbcTemplate.queryForObject(sql, Object.class, data);
     }
 }

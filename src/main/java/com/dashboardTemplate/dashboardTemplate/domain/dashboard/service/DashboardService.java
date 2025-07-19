@@ -268,4 +268,29 @@ public class DashboardService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
     }
+    
+    // 대시보드 그룹 필터링
+    public ResponseEntity<Map<String, Object>> filterData(String dashboardId) {
+
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+
+        // 그룹데이터를 모두 카운트해서 배열에 담아 반환
+        Dashboard dashboard = dashboardRepository.findDashboardByDashboardId(dashboardId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 대시보드를 찾을 수 없습니다."));
+
+        String tableName = dashboard.getTableName();
+
+        List<GroupData> groupDataList = groupDataRepository.findByDashboardId(dashboardId);
+        List<Integer> returnList = new ArrayList<>();
+
+        for (GroupData groupData : groupDataList) {
+            int cnt = jdbcService.countGroupData(tableName, groupData.getDatabaseColumn(), groupData.getData());
+            returnList.add(cnt);
+        }
+
+        responseMap.put("message", returnList);
+        return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+
+        // 조건 데이터를 모두 필터링해서 배열에 담아 반환
+    }
 }

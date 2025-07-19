@@ -4,11 +4,13 @@ import com.dashboardTemplate.dashboardTemplate.domain.JDBC.service.JDBCService;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.dashboardTemplate.dashboardTemplate.domain.dashboard.controller.DashboardController;
+import com.dashboardTemplate.dashboardTemplate.domain.dashboard.service.DashboardService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,9 @@ public class DashboardTest {
 
     @Autowired
     private DashboardController dashboardController;
+
+    @Autowired
+    private DashboardService dashboardService;
 
     // 테이블명에 들어있는 컬럼명 조회 테스트
     @Test
@@ -59,5 +64,24 @@ public class DashboardTest {
         int cnt = jdbcService.countGroupData(tableName, dashboardColumn, data);
 
         log.info("조회된 groupData 개수: {}", cnt);
+    }
+
+    @Test
+    void getFilterData() {
+
+        String dashboardId = "$2a$10$lRKsrtRYhZ7SJhd8XklJ1e51EFBWfBMOfPj1OodP/WUzRHsX22U76";
+
+        ResponseEntity<Map<String, Object>> response = dashboardService.filterData(dashboardId);
+
+        System.out.println("HTTP Status: " + response.getStatusCode());
+
+        Map<String, Object> body = response.getBody();
+
+        if (body != null && body.containsKey("message")) {
+            List<Integer> counts = (List<Integer>) body.get("message");
+            System.out.println("그룹별 카운트 결과: " + counts);
+        } else {
+            System.out.println("응답 바디에 message가 없습니다.");
+        }
     }
 }
