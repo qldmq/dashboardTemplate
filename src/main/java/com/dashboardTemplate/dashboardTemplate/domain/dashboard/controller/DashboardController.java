@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -99,12 +100,16 @@ public class DashboardController {
         return dashboardService.dashboardGroupData(columnName, tableName);
     }
 
-    @Operation(summary = "그룹데이터 필터링 조회", description = "그룹데이터를 필터링하여 조회")
-    @GetMapping("/filterGroupData")
-    public ResponseEntity<Map<String, Object>> getFilterData(String dashboardId) {
+    @Operation(summary = "데이터 필터링 조회", description = "데이터를 필터링하여 조회")
+    @GetMapping("/filterData")
+    public ResponseEntity<Map<String, Object>> getFilterData(@RequestParam String dashboardId,
+                                                             @RequestParam String selectGroupData,
+                                                             @RequestParam String selectAggregatedData,
+                                                             @RequestParam LocalDateTime startDate,
+                                                             @RequestParam LocalDateTime endDate) {
 
         log.info("getFilterData api 진입");
 
-        return dashboardService.filterData(dashboardId);
+        return dashboardService.filterData(dashboardId, selectGroupData, selectAggregatedData, startDate, endDate);
     }
 }

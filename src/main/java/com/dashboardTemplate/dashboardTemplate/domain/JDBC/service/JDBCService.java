@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -77,31 +76,94 @@ public class JDBCService {
         return jdbcTemplate.queryForList(sql, Object.class);
     }
 
-    public Integer countGroupData(String tableName, String databaseColumn, String data) {
+    public Integer countGroupData(String tableName, String databaseColumn, String data, LocalDateTime startDate, LocalDateTime endDate) {
 
-        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?", tableName, databaseColumn);
+        String sql = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND created_at BETWEEN ? AND ?", tableName, databaseColumn);
 
-        return jdbcTemplate.queryForObject(sql, Integer.class, data);
+        return jdbcTemplate.queryForObject(sql, Integer.class, new Object[]{data, startDate, endDate});
     }
 
-    public Object filterAggregatedData(String condition, String tableName, String databaseName, String data) {
+    public Number filterAggregatedData(String statMethod,
+                                       String dashboardCondition,
+                                       String tableName,
+                                       String aggregatedDatabaseColumn,
+                                       String conditionValue,
+                                       String selectGroupData,
+                                       String groupValue,
+                                       LocalDateTime startDate,
+                                       LocalDateTime endDate) {
 
-        String operator = switch (condition) {
-            case "크다" -> ">";
-            case "작다" -> "<";
-            case "크거나 같다" -> ">=";
-            case "작거나 같다" -> "";
-            case "같다" -> "==";
-            case "다르다" -> "!=";
-            case "포함된다" -> "in";
-            case "포함되지 않는다" -> "not in";
-            case "범위 지정" -> "between";
-            case "없음" -> "x";
-            default -> throw new IllegalArgumentException("지원하지 않는 조건입니다.");
+        String stat = switch (statMethod) {
+            case "개수" -> "COUNT";
+            case "합계" -> "SUM";
+            case "평균" -> "AVG";
+            default -> throw new IllegalArgumentException("지원하지 않는 통계 메서드입니다.");
         };
 
-        String sql = String.format("SELECT * FROM %s WHERE %s %s ?", tableName, databaseName, operator);
+        String sql;
+        Object[] params;
 
-        return jdbcTemplate.queryForObject(sql, Object.class, data);
+        switch (dashboardCondition) {
+            case "크다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s > ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{conditionValue, groupValue, startDate, endDate};
+            }
+            case "작다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s < ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{conditionValue, groupValue, startDate, endDate};
+            }
+            case "크거나 같다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s >= ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{conditionValue, groupValue, startDate, endDate};
+            }
+            case "작거나 같다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s <= ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{conditionValue, groupValue, startDate, endDate};
+            }
+            case "같다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s = ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{conditionValue, groupValue, startDate, endDate};
+            }
+            case "다르다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s != ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{conditionValue, groupValue, startDate, endDate};
+            }
+            case "포함된다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s LIKE ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{"%" + conditionValue + "%", groupValue, startDate, endDate};
+            }
+            case "포함되지 않는다" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s NOT LIKE ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{"%" + conditionValue + "%", groupValue, startDate, endDate};
+            }
+            case "범위 지정" -> {
+                String[] values = conditionValue.split(",");
+                if (values.length != 2) throw new IllegalArgumentException("범위 지정은 'a,b' 형태여야 합니다.");
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s BETWEEN ? AND ? AND %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, aggregatedDatabaseColumn, selectGroupData);
+                params = new Object[]{values[0].trim(), values[1].trim(), groupValue, startDate, endDate};
+            }
+            case "없음" -> {
+                sql = String.format("SELECT %s(%s) FROM %s WHERE %s = ? AND created_at BETWEEN ? AND ?",
+                        stat, aggregatedDatabaseColumn, tableName, selectGroupData);
+                params = new Object[]{groupValue, startDate, endDate};
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 조건입니다.");
+        }
+
+        log.info("SQL문: {}, params: {}", sql, Arrays.toString(params));
+        return jdbcTemplate.queryForObject(sql, Number.class, params);
+    }
+    public List<String> getDistinctGroupValues(String tableName, String selectGroupData, LocalDateTime startDate, LocalDateTime endDate) {
+        String sql = String.format("SELECT DISTINCT %s FROM %s WHERE created_at BETWEEN ? AND ?", selectGroupData, tableName);
+        return jdbcTemplate.queryForList(sql, String.class, startDate, endDate);
     }
 }
