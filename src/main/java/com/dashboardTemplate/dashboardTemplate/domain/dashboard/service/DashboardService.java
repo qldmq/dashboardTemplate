@@ -331,48 +331,58 @@ public class DashboardService {
 
         Map<String, Object> responseMap = new LinkedHashMap<>();
 
-        // 그룹데이터를 카운트해서 배열에 담아 반환
-        Dashboard dashboard = dashboardRepository.findDashboardByDashboardId(dashboardId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 대시보드를 찾을 수 없습니다."));
+        try {
+            Dashboard dashboard = dashboardRepository.findDashboardByDashboardId(dashboardId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 대시보드를 찾을 수 없습니다."));
 
-        String tableName = dashboard.getTableName();
+            String tableName = dashboard.getTableName();
 
-        List<String> distinctGroupValues = jdbcService.getDistinctGroupValues(tableName, selectGroupData, startDate, endDate);
-
-        AggregatedData aggregatedData = aggregatedDataRepository.findByDatabaseColumnAlias(selectAggregatedData);
-        if (aggregatedData == null) {
-            throw new IllegalArgumentException("해당 집계 기준을 찾을 수 없습니다.");
-        }
-
-        List<Integer> groupCountList = new ArrayList<>();
-        List<Number> aggregatedResultList = new ArrayList<>();
-
-        for (String groupValue : distinctGroupValues) {
-            int cnt = jdbcService.countGroupData(
-                    tableName,
-                    selectGroupData,
-                    groupValue,
-                    startDate,
-                    endDate
+            List<GroupData> groupDataList = groupDataRepository.findByDashboardIdAndDatabaseColumn(
+                    dashboardId, selectGroupData
             );
-            groupCountList.add(cnt);
 
-            Number aggResult = jdbcService.filterAggregatedData(
-                    aggregatedData.getStatMethod(),
-                    aggregatedData.getDashboardCondition(),
-                    tableName,
-                    aggregatedData.getAggregatedDatabaseColumn(),
-                    aggregatedData.getConditionValue(),
-                    selectGroupData,
-                    groupValue,
-                    startDate,
-                    endDate
-            );
-            aggregatedResultList.add(aggResult);
+            AggregatedData aggregatedData = aggregatedDataRepository.findByDatabaseColumnAlias(selectAggregatedData);
+            if (aggregatedData == null) {
+                throw new IllegalArgumentException("해당 집계 기준을 찾을 수 없습니다.");
+            }
+
+            List<Integer> groupCountList = new ArrayList<>();
+            List<Number> aggregatedResultList = new ArrayList<>();
+
+            for (GroupData groupData : groupDataList) {
+                String groupValue = groupData.getData();
+
+                int count = jdbcService.countGroupData(
+                        tableName,
+                        selectGroupData,
+                        groupValue,
+                        startDate,
+                        endDate
+                );
+                groupCountList.add(count);
+
+                Number aggResult = jdbcService.filterAggregatedData(
+                        aggregatedData.getStatMethod(),
+                        aggregatedData.getDashboardCondition(),
+                        tableName,
+                        aggregatedData.getAggregatedDatabaseColumn(),
+                        aggregatedData.getConditionValue(),
+                        selectGroupData,
+                        groupValue,
+                        startDate,
+                        endDate
+                );
+                aggregatedResultList.add(aggResult);
+            }
+
+            responseMap.put("groupDataList", groupCountList);
+            responseMap.put("aggregatedDataList", aggregatedResultList);
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            log.error("데이터 필터링 중 예외 발생", e);
+            responseMap.put("message", "서버 에러: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
-
-        responseMap.put("groupDataList", groupCountList);
-        responseMap.put("aggregatedDataList", aggregatedResultList);
-        return ResponseEntity.status(HttpStatus.OK).body(responseMap);
     }
 }
