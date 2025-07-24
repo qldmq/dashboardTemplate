@@ -292,6 +292,40 @@ public class DashboardService {
         }
     }
 
+    // 그룹 항목 필터링
+    public ResponseEntity<Map<String, Object>> filterGroupData(String dashboardId, String selectGroupData, LocalDateTime startDate, LocalDateTime endDate) {
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+
+        try {
+            Dashboard dashboard = dashboardRepository.findDashboardByDashboardId(dashboardId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 대시보드를 찾을 수 없습니다."));
+
+            String tableName = dashboard.getTableName();
+
+            List<GroupData> groupDataList = groupDataRepository.findByDashboardIdAndDatabaseColumn(dashboardId, selectGroupData);
+            List<Integer> groupCountList = new ArrayList<>();
+
+            for (GroupData groupData : groupDataList) {
+                int count = jdbcService.countGroupData(
+                        tableName,
+                        selectGroupData,
+                        groupData.getData(),
+                        startDate,
+                        endDate
+                );
+                groupCountList.add(count);
+            }
+
+            responseMap.put("groupDataList", groupCountList);
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            log.error("그룹 항목 데이터 필터링 중 예외 발생", e);
+            responseMap.put("message", "서버 에러: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
+
     // 대시보드 그룹 및 집계 항목 필터링
     public ResponseEntity<Map<String, Object>> filterData(String dashboardId, String selectGroupData, String selectAggregatedData, LocalDateTime startDate, LocalDateTime endDate) {
 

@@ -114,6 +114,18 @@ public class DashboardController {
         return dashboardService.dashboardGroupData(columnName, tableName);
     }
 
+    @Operation(summary = "그룹 항목 데이터 필터링 조회", description = "그룹 항목의 데이터를 필터링하여 조회")
+    @GetMapping("/filterGroupData")
+    public ResponseEntity<Map<String, Object>> getFilterGroupData(@Parameter(name = "dashboardId", description = "대시보드 아이디", example = "$2a$10$wL047LfNwXqx6TAkHPn2pOuGOOpVQ2Y9aEjI6IKhuwkIxwmaudkpK") @RequestParam String dashboardId,
+                                                             @Parameter(name = "selectGroupData", description = "필터링 할 그룹 항목 컬럼명", example = "version") @RequestParam String selectGroupData,
+                                                             @Parameter(name = "startDate", description = "조회 시작일시", example = "2025-07-15T11:43") @RequestParam LocalDateTime startDate,
+                                                             @Parameter(name = "endDate", description = "조회 종료일시", example = "2025-11-24T18:00") @RequestParam LocalDateTime endDate) {
+
+        log.info("getFilterGroupData api 진입");
+
+        return dashboardService.filterGroupData(dashboardId, selectGroupData, startDate, endDate);
+    }
+
     @Operation(summary = "데이터 필터링 조회", description = "데이터를 필터링하여 조회")
     @GetMapping("/filterData")
     public ResponseEntity<Map<String, Object>> getFilterData(@Parameter(name = "dashboardId", description = "대시보드 아이디", example = "$2a$10$wL047LfNwXqx6TAkHPn2pOuGOOpVQ2Y9aEjI6IKhuwkIxwmaudkpK") @RequestParam String dashboardId,
