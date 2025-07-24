@@ -70,7 +70,7 @@ public class DashboardService {
         }
     }
 
-    // 대시보드 조회
+    // 대시보드 전체 리스트 조회
     public ResponseEntity<Map<String, Object>> checkDashboardList(int companyNum, Pageable pageable) {
         Map<String, Object> responseMap = new HashMap<>();
 
@@ -87,6 +87,29 @@ public class DashboardService {
         } catch (Exception e) {
             log.error("대시보드 리스트 조회 중 예외 발생", e);
             responseMap.put("message", "서버 오류: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
+        }
+    }
+    
+    // completed 상태의 대시보드만 조회
+    public ResponseEntity<Map<String, Object>> completedDashboardList(int companyNum, Pageable pageable) {
+
+        Map<String, Object> responseMap = new LinkedHashMap<>();
+
+        try {
+            Page<Dashboard> dashboardPage = dashboardRepository.findByCompanyNumAndDashboardStatus(companyNum, DashboardStatus.COMPLETED, pageable);
+
+            responseMap.put("totalPages", dashboardPage.getTotalPages());
+            responseMap.put("totalCount", dashboardPage.getTotalElements());
+            responseMap.put("currentPage", dashboardPage.getNumber() + 1);
+            responseMap.put("dashboardList", dashboardPage.getContent());
+
+            log.info("completed 상태의 대시보드 리스트 조회 완료");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseMap);
+        } catch (Exception e) {
+            log.error("completedDashboardList 조회 중 에러 발생", e);
+            responseMap.put("message", "서버오류: {}" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
         }
     }

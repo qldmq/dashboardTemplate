@@ -56,6 +56,20 @@ public class DashboardController {
         return dashboardService.checkDashboardList(companyNum, pageable);
     }
 
+    @Operation(summary = "완료 상태 대시보드 조회", description = "completed 상태인 대시보드만 페이지네이션을 통해 조회")
+    @GetMapping("/completedDashboard")
+    public ResponseEntity<Map<String, Object>> completedDashboardList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                      @RequestParam(defaultValue = "1") int page,
+                                                                      @RequestParam(defaultValue = "10") int size) {
+
+        log.info("completedDashboardList api 진입");
+
+        int companyNum = userDetails.getAuth().getCompanyNum();
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return dashboardService.completedDashboardList(companyNum, pageable);
+    }
+
     @Operation(summary = "상세 대시보드 조회", description = "dashboardId와 status를 입력받아 해당하는 대시보드를 조회")
     @GetMapping("/dashboard")
     public ResponseEntity<Map<String, Object>> checkDashboardDetails(@RequestParam String dashboardId, @RequestParam String status) {
