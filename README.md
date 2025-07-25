@@ -16,7 +16,6 @@ JWT 인증, Redis 토큰 관리, Swagger 문서화, MySQL 연동 등을 포함�
 - **진행 기간**: 2025.06 ~ 진행 중  
 - **개발 인원**: 2명
 - **URL**: https://rag-dashboard-console.vercel.app/login
-- **Swagger 주소**: https://dashboardtemplate.duckdns.org/swagger-ui/index.html
 - **Repository**
   - **BackEnd:** https://github.com/qldmq/dashboardTemplate
   - **FrontEnd:** https://github.com/ParkYongHo1/Rag-Dashboard-Console
