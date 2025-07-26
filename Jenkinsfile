@@ -111,7 +111,7 @@ EOF
         stage('Health Check') {
             steps {
                 echo '🏥 헬스 체크 실행...'
-                withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         ssh -i $SSH_KEY ubuntu@52.79.122.132 "
                             curl -f http://localhost:8080/actuator/health -m 10 || echo '❗️헬스 체크 실패 (정상일 수 있음)'
