@@ -25,7 +25,7 @@ pipeline {
         stage('Pre-Deploy Check') {
             steps {
                 echo '🔍 배포 전 서버 상태 확인...'
-                withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         ssh -i $SSH_KEY ubuntu@52.79.122.132 "echo '✅ SSH 연결 성공'; whoami; pwd"
                         ssh -i $SSH_KEY ubuntu@52.79.122.132 "mkdir -p /home/ubuntu/app && ls -la /home/ubuntu/app/"
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo '🚀 서버에 배포 중...'
 
-                withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         scp -i $SSH_KEY build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/
                     '''
@@ -131,7 +131,7 @@ EOF
         }
         failure {
             echo '❌ 배포 실패!'
-            withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+            withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
                 sh '''
                     echo "🚨 실패 시 서버 상태 확인..."
                     ssh -i $SSH_KEY ubuntu@52.79.122.132 "
