@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DB_CREDENTIALS = credentials('DB_CREDENTIALS')
+        JWT_SECRET = credentials('DashboardTemplate_JWT_Secret')
     }
 
     stages {
@@ -24,10 +25,12 @@ pipeline {
         stage('Pre-Deploy Check') {
             steps {
                 echo '🔍 배포 전 서버 상태 확인...'
-                sh '''
-                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "echo '✅ SSH 연결 성공'; whoami; pwd"
-                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "mkdir -p /home/ubuntu/app && ls -la /home/ubuntu/app/"
-                '''
+                withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                        ssh -i $SSH_KEY ubuntu@52.79.122.132 "echo '✅ SSH 연결 성공'; whoami; pwd"
+                        ssh -i $SSH_KEY ubuntu@52.79.122.132 "mkdir -p /home/ubuntu/app && ls -la /home/ubuntu/app/"
+                    '''
+                }
             }
         }
 
@@ -35,14 +38,18 @@ pipeline {
             steps {
                 echo '🚀 서버에 배포 중...'
 
-                sh "scp -i /var/jenkins_home/.ssh/dashboardTemplate.pem build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/"
+                withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                        scp -i $SSH_KEY build/libs/dashboardTemplate-0.0.1-SNAPSHOT.jar ubuntu@52.79.122.132:/home/ubuntu/app/
+                    '''
+                }
 
                 withCredentials([
                     usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
                     string(credentialsId: 'DashboardTemplate_JWT_Secret', variable: 'JWT_SECRET')
                 ]) {
                     sh '''
-                        ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
+                        ssh -i $SSH_KEY ubuntu@52.79.122.132 "
                             cd /home/ubuntu/app
 
                             cat > start_app.sh << 'EOF'
@@ -91,7 +98,6 @@ sh -c 'nohup java \\
   -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \\
   -Djwt.secret=${JWT_SECRET} \\
   -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 & echo \\$! > app.pid'
-
 EOF
 
                             chmod +x start_app.sh
@@ -105,11 +111,13 @@ EOF
         stage('Health Check') {
             steps {
                 echo '🏥 헬스 체크 실행...'
-                sh '''
-                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
-                        curl -f http://localhost:8080/actuator/health -m 10 || echo '❗️헬스 체크 실패 (정상일 수 있음)'
-                    "
-                '''
+                withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                    sh '''
+                        ssh -i $SSH_KEY ubuntu@52.79.122.132 "
+                            curl -f http://localhost:8080/actuator/health -m 10 || echo '❗️헬스 체크 실패 (정상일 수 있음)'
+                        "
+                    '''
+                }
             }
         }
     }
@@ -123,15 +131,17 @@ EOF
         }
         failure {
             echo '❌ 배포 실패!'
-            sh '''
-                echo "🚨 실패 시 서버 상태 확인..."
-                ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 "
-                    ps aux | grep -v grep | grep java || echo '실행 중인 Java 프로세스 없음'
-                    netstat -tlnp | grep 8080 || echo '포트 8080 사용 없음'
-                    /usr/bin/lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
-                    tail -30 /home/ubuntu/app/app.log || echo '로그 파일 없음'
-                "
-            '''
+            withCredentials([sshUserPrivateKey(credentialsId: 'DashboardTemplate_SSH_KEY', keyFileVariable: 'SSH_KEY')]) {
+                sh '''
+                    echo "🚨 실패 시 서버 상태 확인..."
+                    ssh -i $SSH_KEY ubuntu@52.79.122.132 "
+                        ps aux | grep -v grep | grep java || echo '실행 중인 Java 프로세스 없음'
+                        netstat -tlnp | grep 8080 || echo '포트 8080 사용 없음'
+                        /usr/bin/lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
+                        tail -30 /home/ubuntu/app/app.log || echo '로그 파일 없음'
+                    "
+                '''
+            }
         }
     }
 }
