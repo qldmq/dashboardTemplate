@@ -4,6 +4,7 @@ pipeline {
     environment {
         DB_CREDENTIALS = credentials('DB_CREDENTIALS')
         JWT_SECRET = credentials('DashboardTemplate_JWT_Secret')
+        DB_URL = credentials('DB_URL')
     }
 
     stages {
@@ -47,6 +48,7 @@ pipeline {
                 withCredentials([
                     usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
                     string(credentialsId: 'DashboardTemplate_JWT_Secret', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'DB_URL', variable: 'DB_URL'),
                     sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')
                 ]) {
                     sh '''
@@ -93,10 +95,14 @@ echo '🚀 애플리케이션 실행...'
 nohup java \
   -Dfile.encoding=UTF-8 \
   -Dspring.profiles.active=dev \
-  -Dspring.datasource.url=jdbc:mysql://dashboardtemplate.ctyqackomgq0.ap-northeast-2.rds.amazonaws.com:3306/DashboardTemplate \
+  -Dspring.datasource.url=${DB_URL} \
   -Dspring.datasource.username=${DB_USER} \
   -Dspring.datasource.password=${DB_PASS} \
   -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
+  -Dspring.jpa.database-platform=org.hibernate.dialect.MySQLDialect \
+  -Dhibernate.dialect=org.hibernate.dialect.MySQLDialect \
+  -Dspring.jpa.hibernate.ddl-auto=update \
+  -Dspring.jpa.show-sql=false \
   -Djwt.secret=${JWT_SECRET} \
   -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 & echo $! > app.pid
 
@@ -116,6 +122,7 @@ ENDSSH
                 withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         ssh -i $SSH_KEY ubuntu@52.79.122.132 "
+                            sleep 10
                             curl -f http://localhost:8080/actuator/health -m 10 || echo '❗️헬스 체크 실패 (정상일 수 있음)'
                         "
                     '''
