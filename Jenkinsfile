@@ -140,16 +140,65 @@ ENDSSH
         }
         failure {
             echo '❌ 배포 실패!'
-            withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
-                sh '''
-                    echo "🚨 실패 시 서버 상태 확인..."
-                    ssh -i $SSH_KEY ubuntu@52.79.122.132 "
-                        ps aux | grep -v grep | grep java || echo '실행 중인 Java 프로세스 없음'
-                        netstat -tlnp | grep 8080 || echo '포트 8080 사용 없음'
-                        /usr/bin/lsof -i:8080 || echo '8080 포트 사용 프로세스 없음'
-                        tail -30 /home/ubuntu/app/app.log || echo '로그 파일 없음'
-                    "
-                '''
+            withCredentials([
+                string(credentialsId: 'DB_URL', variable: 'DB_URL'),
+                usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS'),
+                string(credentialsId: 'DashboardTemplate_JWT_Secret', variable: 'JWT_SECRET')
+            ]) {
+                echo "✅ DB_URL=${DB_URL.take(30)}..." // 전체 출력은 하지 말기
+                echo "✅ DB_USER=${DB_USER}"
+                echo "✅ JWT_SECRET=${JWT_SECRET.take(5)}*****"
+
+                sh """
+                    ssh -i /var/jenkins_home/.ssh/dashboardTemplate.pem ubuntu@52.79.122.132 '
+                        cd /home/ubuntu/app
+
+                        cat > start_app.sh << "EOF"
+            #!/bin/bash
+
+            echo "📦 기존 프로세스 종료"
+
+            if [ -f app.pid ]; then
+                PID=\\\$(cat app.pid)
+                if ps -p \\\$PID > /dev/null 2>&1; then
+                    kill -15 \\\$PID
+                    sleep 5
+                    if ps -p \\\$PID > /dev/null 2>&1; then
+                        kill -9 \\\$PID
+                    fi
+                fi
+                rm -f app.pid
+            fi
+
+            PORT_PID=\\\$(lsof -ti:8080)
+            if [ -n "\\\$PORT_PID" ]; then
+                kill -15 \\\$PORT_PID
+                sleep 5
+                if lsof -ti:8080 > /dev/null 2>&1; then
+                    kill -9 \\\$(lsof -ti:8080)
+                fi
+            fi
+
+            echo "🚀 앱 실행..."
+
+            export DB_URL="${DB_URL}"
+            export DB_USER="${DB_USER}"
+            export DB_PASS="${DB_PASS}"
+            export JWT_SECRET="${JWT_SECRET}"
+
+            nohup java \\
+              -Dspring.profiles.active=dev \\
+              -Dspring.datasource.url=\\\${DB_URL} \\
+              -Dspring.datasource.username=\\\${DB_USER} \\
+              -Dspring.datasource.password=\\\${DB_PASS} \\
+              -Djwt.secret=\\\${JWT_SECRET} \\
+              -jar dashboardTemplate-0.0.1-SNAPSHOT.jar > app.log 2>&1 & echo \\\$! > app.pid
+            EOF
+
+                        chmod +x start_app.sh
+                        ./start_app.sh
+                    '
+                """
             }
         }
     }
