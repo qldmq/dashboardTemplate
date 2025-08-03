@@ -11,7 +11,7 @@ public interface AggregatedDataRepository extends JpaRepository<AggregatedData, 
 
     List<AggregatedData> findByDashboardId(String dashboardId);
 
-    AggregatedData findByDatabaseColumnAlias(String alias);
+    AggregatedData findByDatabaseColumnAliasAndDashboardId(String alias, String dashboardId);
 
     void deleteByDashboardId(String dashboardId);
 }

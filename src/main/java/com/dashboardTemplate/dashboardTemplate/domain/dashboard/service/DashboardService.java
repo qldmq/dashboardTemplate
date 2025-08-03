@@ -341,7 +341,7 @@ public class DashboardService {
                     dashboardId, selectGroupData
             );
 
-            AggregatedData aggregatedData = aggregatedDataRepository.findByDatabaseColumnAlias(selectAggregatedData);
+            AggregatedData aggregatedData = aggregatedDataRepository.findByDatabaseColumnAliasAndDashboardId(selectAggregatedData, dashboardId);
             if (aggregatedData == null) {
                 throw new IllegalArgumentException("해당 집계 기준을 찾을 수 없습니다.");
             }
